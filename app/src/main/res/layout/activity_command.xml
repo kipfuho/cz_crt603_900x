@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.grg.activity.MainActivity">
+
+    <ImageView
+      android:id="@+id/temp_iv"
+      android:layout_width="800dp"
+      android:layout_height="600dp"
+      android:layout_marginTop="85dp"
+      android:layout_marginLeft="20dp"
+      android:layout_alignParentLeft="true"
+      android:contentDescription="temp_image" />
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="2dp"
+      android:layout_alignParentBottom="true"
+      android:layout_centerHorizontal="true"
+      android:layout_gravity="center"
+      android:gravity="center"
+      android:orientation="horizontal">
+
+      <TextView
+        android:id="@+id/back_bt"
+        style="@style/OCR_buttonStyle"
+        android:text="@string/back" />
+
+      <TextView
+        android:id="@+id/detectBtn"
+        style="@style/OCR_buttonStyle"
+        android:text="@string/ocr_identify" />
+
+      <TextView
+        android:id="@+id/selectPicBtn"
+        style="@style/OCR_buttonStyle"
+        android:text="@string/select_pic" />
+
+      <TextView
+        android:id="@+id/clearBtn"
+        style="@style/OCR_buttonStyle"
+        android:text="@string/ocr_clear" />
+
+      <TextView
+        android:id="@+id/settingBtn"
+        style="@style/OCR_buttonStyle"
+        android:text="@string/face_setting" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:id="@+id/ocr_ll"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="center"
+      android:orientation="vertical" />
+
+    <LinearLayout
+      android:id="@+id/result_ll"
+      android:layout_width="400dp"
+      android:layout_height="wrap_content"
+      android:layout_marginRight="20dp"
+      android:layout_alignParentRight="true"
+      android:layout_centerVertical="true"
+      android:gravity="center"
+      android:orientation="vertical" />
+
+    <RelativeLayout
+      android:id="@+id/camera_rl"
+      android:layout_width="800dp"
+      android:layout_height="600dp"
+      android:layout_marginTop="85dp"
+      android:layout_marginLeft="20dp"
+      android:layout_alignParentLeft="true"
+      android:background="@color/black"></RelativeLayout>
+
+    <TextView
+      android:id="@+id/name_tv"
+      android:textStyle="bold"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:layout_marginBottom="20dp"
+      android:layout_marginStart="20dp"
+      android:layout_centerHorizontal="true"
+      android:text="@string/name"
+      android:textSize="30sp" />
+
+  </RelativeLayout>
+
+  <data>
+    <variable
+      name="dummy"
+      type="String" />
+  </data>
+</layout>

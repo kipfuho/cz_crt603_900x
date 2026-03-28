@@ -1,0 +1,77 @@
+// Third-party libraries, App version number management, and component mode switching configuration
+ext {
+
+    android = [
+            compileSdkVersion: 33,
+            minSdkVersion    : 24,
+            targetSdkVersion : 33,
+            versionCode      : 29,
+            versionName      : "1.0.853",
+    ]
+
+
+    libsVersion = [
+            // App dependencies version
+            supportLibraryVersion = "28.0.2",
+            support_v4 = "28.0.2",
+            arouter_api = "1.3.1",
+            arouter_compiler = "1.1.4",
+            glide = "3.8.0",
+            reflection = "1.2.0",
+            leak = "1.3",
+            block = "1.5.0",
+            volley = "1.0.0",
+            fastjson = "1.1.56.android",
+            circleImageView = "2.1.0",
+            xcrash = "2.1.3",
+            xui = "1.0.4",
+            grg_libcommon = "1.0.8",
+            grg_libface = "1.2.5",
+            grg_leds005 = "1.0.0",
+            countdownview = "2.1.6",
+            recycler_adapter_helper = "2.9.42"
+
+    ]
+
+    dependencies = [
+            // Android official libraries
+            appcompatV7            : "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion",
+            support_v4             : "com.android.support:support-v4:$rootProject.support_v4",
+            design                 : "com.android.support:design:$rootProject.supportLibraryVersion",
+            recycleview            : "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion",
+            annotations            : "com.android.support:support-annotations:$rootProject.supportLibraryVersion",
+            // Routing communication
+            arouter_api            : "com.alibaba:arouter-api:$rootProject.arouter_api",
+            arouter_compiler       : "com.alibaba:arouter-compiler:$rootProject.arouter_compiler",
+            // glide
+            glide                  : "com.github.bumptech.glide:glide:$rootProject.glide",
+            // Break through reflection limits
+            reflection             : "me.weishu:free_reflection:$rootProject.reflection",
+            // Detect leak detection
+            leak                   : "com.squareup.leakcanary:leakcanary-android:$rootProject.leak",
+            // Detect UI lag
+            block                  : "com.github.markzhai:blockcanary-android:$rootProject.block",
+            // Network request framework
+            volley                 : "com.android.volley:volley:$rootProject.volley",
+            // Google official library cardVIEW
+            cardView               : "com.android.support:cardview-v7:$rootProject.supportLibraryVersion",
+            // Alibaba json library
+            fastjson               : "com.alibaba:fastjson:$rootProject.fastjson",
+            // Circular avatar library
+            circleImageView        : "de.hdodenhof:circleimageview:$rootProject.circleImageView",
+            // iQIYI's crash log capture library, which can capture native errors
+            xcrash                 : "com.iqiyi.xcrash:xcrash-android-lib:$rootProject.xcrash",
+            // Super strong UI library
+            xui                    : "com.github.xuexiangjys:XUI:$rootProject.xui",
+            // Countdown library
+            countdownview          : "com.github.iwgang:countdownview:$rootProject.countdownview",
+            // GRG common library
+            grg_libcommon          : "com.grg:lib_common:$rootProject.grg_libcommon",
+            // GRG face library
+            grg_libface            : "com.grg:lib_grgface_release:$rootProject.grg_libface",
+            // GRG fill light library
+            grg_leds005            : "com.grg:lib_led_s005:$rootProject.grg_leds005",
+            recycler_adapter_helper: "com.github.CymChad:BaseRecyclerViewAdapterHelper:$rootProject.recycler_adapter_helper",
+            dbinspector            : "im.dino:dbinspector:3.4.1@aar"
+    ]
+}

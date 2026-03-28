@@ -1,0 +1,133 @@
+apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'kotlin-parcelize'
+apply plugin: 'kotlin-kapt'
+
+android {
+    dataBinding {
+        enabled = true
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefe r, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+//    signingConfigs {
+//        debug {
+//            storeFile file('C:\\GrgKey.keystore')
+//            keyAlias 'grgkey.keystore'
+//            storePassword 'grgbanking002152'
+//            keyPassword 'grgbanking002152'
+//        }
+//        release {
+//            storeFile file('C:\\GrgKey.keystore')
+//            keyAlias 'grgkey.keystore'
+//            storePassword 'grgbanking002152'
+//            keyPassword 'grgbanking002152'
+//        }
+//    }
+
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//            signingConfig signingConfigs.release
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "CRT603_900X_${defaultConfig.versionName}.apk"
+                }
+            }
+        }
+    }
+
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+
+    defaultConfig {
+        configurations.all {
+            resolutionStrategy { force 'androidx.core:core-ktx:1.9.0' }
+        }
+        /*applicationId "com.grg.faceaio"*/
+        applicationId "com.grg.ocr"
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "int", "ocrType", ocrType
+
+        dataBinding {
+            enabled true
+        }
+
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+    }
+
+    packagingOptions {
+        pickFirst 'lib/armeabi-v7a/libopencv_java3.so'
+        pickFirst 'lib/armeabi-v7a/libwlt2bmp.so'
+        doNotStrip "*/armeabi-v7a/*.so"
+        pickFirst '**/*.so'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+//            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "CRT603_900X_${defaultConfig.versionName}.apk"
+                }
+            }
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs', 'src/main/jni/thirdparty/hiai_ddk', '../../../third_party/opencv/Android/OpenCV-android-sdk/sdk/native/libs', 'src/main/jniLibs', 'src/main/jniLibs/armeabi-v7a']
+            jni.srcDirs = ['src/main/jni']
+            assets.srcDirs = ['src/main/assets', '../../../model']
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/libs']
+        }
+    }
+
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+
+}
+
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'com.joanzapata.android:base-adapter-helper:1.1.11'
+    implementation 'com.github.bumptech.glide:glide:4.1.1'
+    implementation 'org.jmrtd:jmrtd:0.7.29'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.1.1'
+
+    implementation 'com.iqiyi.xcrash:xcrash-android-lib:3.1.0'
+
+
+    api(name: "lib_sdk_v1.0.85_202601270924", ext: 'aar') { transitive = true }
+    api(name: "lib_usbcamera-release", ext: 'aar') { transitive = true }
+    api(name: "lib_new_face_release_v1.0.85_202601270923", ext: 'aar') { transitive = true }
+    api(name: "lib_crtreader900x-release", ext: 'aar') { transitive = true }
+    api(name: "lib_ocr_zs2_v1.0.85_202601271411", ext: 'aar') { transitive = true }
+    api(name: "lib_grglog_v2.0_202601220901", ext: 'aar') { transitive = true }
+
+    api(rootProject.ext.dependencies.fastjson)
+}

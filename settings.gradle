@@ -1,0 +1,4 @@
+rootProject.name = "CZ_CRT603_900X_Demo"
+include ':app'
+
+
