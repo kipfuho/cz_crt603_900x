@@ -84,13 +84,15 @@ public class SimplePassportReader {
   public void getAllData(String mrz, OnGetAllDataResult result) {
     new Thread(() -> {
       try {
+        // ? sdk could hide some logic for reader
+        crtReadCardDG(mrz);
         Log.d(TAG, "BAC Started: " + "mrz=" + mrz);
 
         CrtCardService cardService = new CrtCardService(crt900xNative, readerFd);
         PassportService passportService = new PassportService(cardService, 256, 256, 224, false,
             true);
 
-        dummy();
+        dummy(); // reset previous secure message
         BACKeySpec bacKey = getBACKey(mrz);
         passportService.close();
         passportService.open();
@@ -239,7 +241,7 @@ public class SimplePassportReader {
         Log.e(TAG, "BAC FAILED, " + e);
         result.onError(-1, e.getMessage());
       } finally {
-        dummy();
+        dummy(); // reset current secure message
       }
     }).start();
   }
