@@ -4,6 +4,8 @@ import android.util.Base64;
 import android.util.Log;
 import com.alibaba.fastjson.JSONObject;
 import com.device.Crt900x;
+import com.device.CrtPassportReader;
+import com.grg.grglog.LogUtils;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +33,41 @@ public class SimplePassportReader {
     this.readerFd = readerFd;
   }
 
+  private void dummy() {
+    int[] respLen = new int[1];
+    byte[] resp = new byte[256];
+    crt900xNative.CrtSendAPDU('A', Utils.hexStr2ByteArrs("00 70 80 00").length,
+        Utils.hexStr2ByteArrs("00 70 80 00"), respLen, resp);
+
+    if (resp.length < 2) {
+      Log.d(TAG, "Channel close SW: " + resp);
+    } else {
+      Log.d(TAG, "Channel close SW: " + String.format("%02X%02X", resp[respLen[0] - 2],
+          resp[respLen[0] - 1]));
+    }
+  }
+
+  public int crtReadCardDG(String mrz) {
+    byte[] info = new byte[1024];
+    char[] cKeys = mrz.toCharArray();
+    LogUtils.e("==CrtPassportReader", "开始读卡===》");
+    int iRet = this.crt900xNative.CrtReaderReadCardInfo(cKeys, info);
+    LogUtils.e("==CrtPassportReader", "读卡结束==》" + iRet);
+    if (iRet != 0) {
+      if (iRet == -31) {
+        LogUtils.e("==CrtPassportReader", "mrz wrong");
+      } else if (iRet == -32) {
+        LogUtils.e("==CrtPassportReader", "Read failed!");
+      } else {
+        LogUtils.e("==CrtPassportReader", "Read text failed");
+      }
+
+      return -106;
+    } else {
+      return 0;
+    }
+  }
+
   public BACKeySpec getBACKey(String mrz) {
     MRZInfo mrzInfo = new MRZInfo(mrz);
     BACKeySpec bacKey = new BACKey(mrzInfo.getDocumentNumber(), mrzInfo.getDateOfBirth(),
@@ -48,6 +85,7 @@ public class SimplePassportReader {
         PassportService passportService = new PassportService(cardService, 256, 256, 224, false,
             true);
 
+        dummy();
         BACKeySpec bacKey = getBACKey(mrz);
         passportService.close();
         passportService.open();
@@ -196,12 +234,7 @@ public class SimplePassportReader {
         Log.e(TAG, "BAC FAILED, " + e);
         result.onError(-1, e.getMessage());
       } finally {
-        int[] respLen = new int[1];
-        byte[] resp = new byte[256];
-        crt900xNative.CrtSendAPDU('A', Utils.hexStr2ByteArrs("00 70 80 00").length,
-            Utils.hexStr2ByteArrs("00 70 80 00"), respLen, resp);
-        Log.d(TAG, "Channel close SW: " + String.format("%02X%02X", resp[respLen[0] - 2],
-            resp[respLen[0] - 1]));
+        dummy();
       }
     }).start();
   }
