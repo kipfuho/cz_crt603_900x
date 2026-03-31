@@ -1,5 +1,6 @@
 package com.grg.activity;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import com.alibaba.fastjson.JSONObject;
 import com.device.Crt900x;
 import com.device.CrtPassportReader;
 import com.device.CrtReaderUtil;
@@ -19,7 +21,11 @@ import com.grg.sdk.InitCallBack;
 import com.grg.sdk.OcrParam;
 import com.grg.sdk.TakePicCallBack;
 import com.grg.test.R;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -181,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
     }
     showStatus("Reading chip…");
 
-    mPassportReader.getAllData(mrz, new SimplePassportReader.OnGetAllDataResult() {
+    mPassportReader.getAllData(mrz, this, new SimplePassportReader.OnGetAllDataResult() {
       @Override
       public void onSuccess(String dgData) {
         showStatus("Chip read OK");

@@ -1,12 +1,15 @@
 package com.grg.crt;
 
+import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
 import com.alibaba.fastjson.JSONObject;
 import com.device.Crt900x;
-import com.device.CrtPassportReader;
 import com.grg.grglog.LogUtils;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -33,13 +36,26 @@ public class SimplePassportReader {
     this.readerFd = readerFd;
   }
 
+  private String saveToFile(Context context, JSONObject dataObject) throws IOException {
+    String fileName = "nfc_data_" + System.currentTimeMillis() + ".json";
+
+    File file = new File(context.getFilesDir(), fileName);
+
+    try (FileOutputStream fos = new FileOutputStream(file)) {
+      fos.write(dataObject.toString().getBytes(StandardCharsets.UTF_8));
+      fos.flush();
+    }
+
+    return file.getAbsolutePath();
+  }
+
   private void dummy() {
     int[] respLen = new int[1];
     byte[] resp = new byte[256];
     crt900xNative.CrtSendAPDU('A', Utils.hexStr2ByteArrs("00 70 80 00").length,
         Utils.hexStr2ByteArrs("00 70 80 00"), respLen, resp);
 
-    if (resp.length < 2) {
+    if (respLen[0] < 2) {
       Log.d(TAG, "Channel close SW: " + resp);
     } else {
       Log.d(TAG, "Channel close SW: " + String.format("%02X%02X", resp[respLen[0] - 2],
@@ -81,7 +97,7 @@ public class SimplePassportReader {
     return bacKey;
   }
 
-  public void getAllData(String mrz, OnGetAllDataResult result) {
+  public void getAllData(String mrz, Context context, OnGetAllDataResult result) {
     new Thread(() -> {
       try {
         // ? sdk could hide some logic for reader
@@ -236,6 +252,7 @@ public class SimplePassportReader {
         sb.append("  ").append(sodFile.getDocSigningCertificate().getSubjectDN()).append("\n");
 
         Log.d(TAG, dataObject.toString());
+        saveToFile(context, dataObject);
         result.onSuccess(sb.toString());
       } catch (Exception e) {
         Log.e(TAG, "BAC FAILED, " + e);
