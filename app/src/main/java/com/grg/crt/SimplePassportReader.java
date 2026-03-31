@@ -38,8 +38,7 @@ public class SimplePassportReader {
 
   private String saveToFile(Context context, JSONObject dataObject) throws IOException {
     String fileName = "nfc_data_" + System.currentTimeMillis() + ".json";
-
-    File file = new File(context.getFilesDir(), fileName);
+    File file = new File("/storage/emulated/0/DCIM/" + fileName);
 
     try (FileOutputStream fos = new FileOutputStream(file)) {
       fos.write(dataObject.toString().getBytes(StandardCharsets.UTF_8));
