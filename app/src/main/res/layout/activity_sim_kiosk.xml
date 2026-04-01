@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  activity_sim_kiosk.xml
+  Industrial/utilitarian aesthetic — dark chrome panels, amber accent, monospace data.
+  Designed for a kiosk / POS terminal form factor (landscape, touch-friendly targets).
+-->
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="horizontal"
+  android:background="#0D0F0E">
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       LEFT PANEL — card info + primary actions
+       ═══════════════════════════════════════════════════════════════ -->
+  <LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- ── Header ──────────────────────────────────────────────── -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:gravity="center_vertical"
+      android:paddingBottom="10dp">
+
+      <View
+        android:layout_width="4dp"
+        android:layout_height="28dp"
+        android:background="#F0A500"
+        android:layout_marginEnd="10dp"/>
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SIM KIOSK"
+        android:textColor="#F0A500"
+        android:textSize="18sp"
+        android:letterSpacing="0.15"
+        android:fontFamily="monospace"
+        android:textStyle="bold"/>
+
+      <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:background="#2A2E2C"/>
+
+    </LinearLayout>
+
+    <!-- ── Connection settings (spinners + connect buttons) ──── -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:background="#141918"
+      android:padding="10dp"
+      android:layout_marginBottom="10dp">
+
+      <!-- Row 1: Port + Baud spinners -->
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="6dp">
+
+        <TextView
+          android:layout_width="36dp"
+          android:layout_height="wrap_content"
+          android:text="PORT"
+          android:textColor="#6B7573"
+          android:textSize="9sp"
+          android:fontFamily="monospace"
+          android:letterSpacing="0.1"/>
+
+        <Spinner
+          android:id="@+id/spinnerSimPort"
+          android:layout_width="0dp"
+          android:layout_height="36dp"
+          android:layout_weight="1"
+          android:layout_marginEnd="8dp"
+          android:background="#1E2422"
+          android:popupBackground="#1E2422"
+          android:textColor="#6B7573"
+          android:textSize="9sp" />
+
+        <TextView
+          android:layout_width="36dp"
+          android:layout_height="wrap_content"
+          android:text="BAUD"
+          android:textColor="#6B7573"
+          android:textSize="9sp"
+          android:fontFamily="monospace"
+          android:letterSpacing="0.1"/>
+
+        <Spinner
+          android:id="@+id/spinnerSimBaud"
+          android:layout_width="0dp"
+          android:layout_height="36dp"
+          android:layout_weight="1"
+          android:background="#1E2422"
+          android:popupBackground="#1E2422"
+          android:textColor="#6B7573"
+          android:textSize="9sp" />
+
+      </LinearLayout>
+
+      <!-- Row 2: Addr spinner + Connect/Disconnect buttons -->
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+          android:layout_width="36dp"
+          android:layout_height="wrap_content"
+          android:text="ADDR"
+          android:textColor="#6B7573"
+          android:textSize="9sp"
+          android:fontFamily="monospace"
+          android:letterSpacing="0.1"/>
+
+        <Spinner
+          android:id="@+id/spinnerSimAddr"
+          android:layout_width="0dp"
+          android:layout_height="36dp"
+          android:layout_weight="1"
+          android:layout_marginEnd="8dp"
+          android:background="#1E2422"
+          android:popupBackground="#1E2422"/>
+
+        <TextView
+          android:id="@+id/tvConnInfo"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:text="Not connected"
+          android:textColor="#CF6679"
+          android:textSize="10sp"
+          android:fontFamily="monospace"
+          android:layout_marginEnd="6dp"/>
+
+        <Button
+          android:id="@+id/btnSimConnect"
+          android:layout_width="wrap_content"
+          android:layout_height="36dp"
+          android:text="CONNECT"
+          android:textColor="#0D0F0E"
+          android:textSize="10sp"
+          android:fontFamily="monospace"
+          android:backgroundTint="#8EC97A"
+          android:paddingStart="12dp"
+          android:paddingEnd="12dp"
+          android:layout_marginEnd="4dp"/>
+
+        <Button
+          android:id="@+id/btnSimDisconnect"
+          android:layout_width="wrap_content"
+          android:layout_height="36dp"
+          android:text="DISC."
+          android:textColor="#E8EBE9"
+          android:textSize="10sp"
+          android:fontFamily="monospace"
+          android:backgroundTint="#2A2E2C"
+          android:paddingStart="12dp"
+          android:paddingEnd="12dp"/>
+
+      </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- ── ICCID card ───────────────────────────────────────────── -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:background="#141918"
+      android:padding="14dp"
+      android:layout_marginBottom="10dp">
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ICCID"
+        android:textColor="#6B7573"
+        android:textSize="10sp"
+        android:letterSpacing="0.2"
+        android:fontFamily="monospace"/>
+
+      <TextView
+        android:id="@+id/tvIccid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="—"
+        android:textColor="#E8EBE9"
+        android:textSize="16sp"
+        android:fontFamily="monospace"
+        android:layout_marginTop="4dp"
+        android:letterSpacing="0.05"/>
+
+    </LinearLayout>
+
+    <!-- ── Slot count card ─────────────────────────────────────── -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:background="#141918"
+      android:padding="14dp"
+      android:gravity="center_vertical"
+      android:layout_marginBottom="10dp">
+
+      <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="CARDS IN HOLDER"
+          android:textColor="#6B7573"
+          android:textSize="10sp"
+          android:letterSpacing="0.2"
+          android:fontFamily="monospace"/>
+
+        <TextView
+          android:id="@+id/tvSlotCount"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="—"
+          android:textColor="#F0A500"
+          android:textSize="28sp"
+          android:fontFamily="monospace"
+          android:textStyle="bold"
+          android:layout_marginTop="2dp"/>
+
+      </LinearLayout>
+
+      <Button
+        android:id="@+id/btnCountSlots"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:text="COUNT"
+        android:textColor="#0D0F0E"
+        android:textSize="11sp"
+        android:letterSpacing="0.1"
+        android:fontFamily="monospace"
+        android:backgroundTint="#F0A500"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"/>
+
+    </LinearLayout>
+
+    <!-- ── Status bar ──────────────────────────────────────────── -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:background="#141918"
+      android:padding="12dp"
+      android:layout_marginBottom="16dp">
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="STATUS"
+        android:textColor="#6B7573"
+        android:textSize="10sp"
+        android:letterSpacing="0.2"
+        android:fontFamily="monospace"/>
+
+      <TextView
+        android:id="@+id/tvSimStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Initialising…"
+        android:textColor="#8EC97A"
+        android:textSize="12sp"
+        android:fontFamily="monospace"
+        android:layout_marginTop="4dp"
+        android:maxLines="2"/>
+
+    </LinearLayout>
+
+    <!-- ── Primary actions ─────────────────────────────────────── -->
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="CARD TRANSPORT"
+      android:textColor="#6B7573"
+      android:textSize="10sp"
+      android:letterSpacing="0.2"
+      android:fontFamily="monospace"
+      android:layout_marginBottom="8dp"/>
+
+    <!-- Read ICCID (most important — full width, accent) -->
+    <Button
+      android:id="@+id/btnReadIccid"
+      android:layout_width="match_parent"
+      android:layout_height="56dp"
+      android:text="▶  READ ICCID"
+      android:textColor="#0D0F0E"
+      android:textSize="13sp"
+      android:letterSpacing="0.08"
+      android:fontFamily="monospace"
+      android:textStyle="bold"
+      android:backgroundTint="#F0A500"
+      android:layout_marginBottom="8dp"/>
+
+    <!-- Push + Retract side by side -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:layout_marginBottom="8dp">
+
+      <Button
+        android:id="@+id/btnPushToFront"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_weight="1"
+        android:layout_marginEnd="6dp"
+        android:text="⏩  PUSH TO GATE"
+        android:textColor="#E8EBE9"
+        android:textSize="11sp"
+        android:letterSpacing="0.05"
+        android:fontFamily="monospace"
+        android:backgroundTint="#1E2422"/>
+
+      <Button
+        android:id="@+id/btnRetract"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_weight="1"
+        android:layout_marginStart="6dp"
+        android:text="⏪  RETRACT"
+        android:textColor="#E8EBE9"
+        android:textSize="11sp"
+        android:letterSpacing="0.05"
+        android:fontFamily="monospace"
+        android:backgroundTint="#1E2422"/>
+
+    </LinearLayout>
+
+    <!-- Cold reset + Deactivate side by side -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal">
+
+      <Button
+        android:id="@+id/btnSimColdReset"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:layout_marginEnd="6dp"
+        android:text="COLD RESET"
+        android:textColor="#E8EBE9"
+        android:textSize="11sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#1E2422"/>
+
+      <Button
+        android:id="@+id/btnSimDeactivate"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:layout_marginStart="6dp"
+        android:text="DEACTIVATE"
+        android:textColor="#CF6679"
+        android:textSize="11sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#1E2422"/>
+
+    </LinearLayout>
+
+    <View
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      android:layout_weight="1"/>
+
+    <!-- Back button -->
+    <Button
+      android:id="@+id/btnSimBack"
+      android:layout_width="match_parent"
+      android:layout_height="44dp"
+      android:text="← BACK"
+      android:textColor="#6B7573"
+      android:textSize="11sp"
+      android:fontFamily="monospace"
+      android:backgroundTint="#0D0F0E"
+      android:onClick="finish"/>
+
+  </LinearLayout>
+
+  <!-- Divider -->
+  <View
+    android:layout_width="1dp"
+    android:layout_height="match_parent"
+    android:background="#1E2422"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       RIGHT PANEL — device utilities + log
+       ═══════════════════════════════════════════════════════════════ -->
+  <LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- ── Device utilities ────────────────────────────────────── -->
+    <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:gravity="center_vertical"
+      android:paddingBottom="10dp">
+
+      <View
+        android:layout_width="4dp"
+        android:layout_height="20dp"
+        android:background="#3A7BFF"
+        android:layout_marginEnd="10dp"/>
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DEVICE"
+        android:textColor="#3A7BFF"
+        android:textSize="12sp"
+        android:letterSpacing="0.2"
+        android:fontFamily="monospace"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:layout_marginBottom="8dp">
+
+      <Button
+        android:id="@+id/btnSimQueryStatus"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_weight="1"
+        android:layout_marginEnd="4dp"
+        android:text="STATUS"
+        android:textColor="#E8EBE9"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#141918"/>
+
+      <Button
+        android:id="@+id/btnSimQuerySensors"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_weight="1"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:text="SENSORS"
+        android:textColor="#E8EBE9"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#141918"/>
+
+      <Button
+        android:id="@+id/btnSimFirmware"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_weight="1"
+        android:layout_marginStart="4dp"
+        android:text="FIRMWARE"
+        android:textColor="#E8EBE9"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#141918"/>
+
+    </LinearLayout>
+
+    <!-- ── Log header ──────────────────────────────────────────── -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:gravity="center_vertical"
+      android:layout_marginTop="8dp"
+      android:layout_marginBottom="6dp">
+
+      <View
+        android:layout_width="4dp"
+        android:layout_height="20dp"
+        android:background="#3A7BFF"
+        android:layout_marginEnd="10dp"/>
+
+      <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="COMMAND LOG"
+        android:textColor="#3A7BFF"
+        android:textSize="12sp"
+        android:letterSpacing="0.2"
+        android:fontFamily="monospace"/>
+
+      <Button
+        android:id="@+id/btnSimClearLog"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:text="CLEAR"
+        android:textColor="#6B7573"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#141918"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"/>
+
+    </LinearLayout>
+
+    <!-- ── Scrollable log ──────────────────────────────────────── -->
+    <ScrollView
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      android:background="#0A0C0B"
+      android:padding="2dp">
+
+      <TextView
+        android:id="@+id/tvSimLog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:textColor="#8EC97A"
+        android:textSize="11sp"
+        android:fontFamily="monospace"
+        android:lineSpacingMultiplier="1.3"
+        android:scrollbars="vertical"/>
+
+    </ScrollView>
+
+  </LinearLayout>
+
+</LinearLayout>

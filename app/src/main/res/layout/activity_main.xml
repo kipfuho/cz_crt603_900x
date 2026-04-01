@@ -46,12 +46,31 @@
       android:orientation="horizontal">
 
       <Button
+        android:id="@+id/takePictureBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:text="Take picture" />
+
+      <Button
         android:id="@+id/singleReadBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:enabled="false"
-        android:text="Scan" />
+        android:text="Scan once" />
+
+      <Button
+        android:id="@+id/loopReadBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:text="Loop scan" />
+
+      <Button
+        android:id="@+id/btSimKiosk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SIM Kiosk" />
 
       <Button
         android:id="@+id/exitBtn"

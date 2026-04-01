@@ -1,31 +1,32 @@
 package com.grg.activity;
 
-import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import com.alibaba.fastjson.JSONObject;
+import com.bumptech.glide.Glide;
 import com.device.Crt900x;
 import com.device.CrtPassportReader;
 import com.device.CrtReaderUtil;
+import com.grg.Utils;
 import com.grg.crt.SimplePassportReader;
-import com.grg.sdk.DetectPicCallBack;
+import com.grg.grglog.GrgLog;
+import com.grg.grglog.LogUtils;
 import com.grg.sdk.GrgSDK;
 import com.grg.sdk.InitCallBack;
 import com.grg.sdk.OcrParam;
-import com.grg.sdk.TakePicCallBack;
 import com.grg.test.R;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
+import xcrash.XCrash;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,19 +40,30 @@ public class MainActivity extends AppCompatActivity {
   private ImageView mCurrentIv;
   private TextView mStatusTv;
   private TextView mMrzTv;
+  private Button mTakePictureBtn;
   private Button mScanBtn;
+  private Button mLoopScanBtn;
+
+  int OcrType = 0;
+  boolean isOCRinit = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
+    initLog();
     mCameraView = findViewById(R.id.cameraView);
     mCurrentIv = findViewById(R.id.current_iv);
     mStatusTv = findViewById(R.id.resultTv);
     mMrzTv = findViewById(R.id.result_lv);
+
+    mTakePictureBtn = findViewById(R.id.takePictureBtn);
+    mTakePictureBtn.setEnabled(false);
     mScanBtn = findViewById(R.id.singleReadBtn);
     mScanBtn.setEnabled(false);
+    mLoopScanBtn = findViewById(R.id.loopReadBtn);
+    mLoopScanBtn.setEnabled(false);
 
     mOcrParam = new OcrParam();
     mGrgSDK = GrgSDK.getInstance(this);
@@ -77,16 +89,26 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
+  private void initLog() {
+    String LogPath = getExternalFilesDir(null).getPath();
+    GrgLog.init(LogPath + "/log/" + new SimpleDateFormat(GrgLog.DATE_FORMAT).format(new Date()));
+    XCrash.init(this, new XCrash.InitParameters().setLogDir(
+        LogPath + "/crash/" + new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
+    LogUtils.openLog(true);
+  }
+
   private void initGrg() {
     mGrgSDK.init(new InitCallBack() {
       @Override
       public void initSuccess() {
         initPassportReader();
-        mGrgSDK.openCamera(mCameraView, MainActivity.this, mOcrParam);
-        runOnUiThread(() -> {
+        if (OcrType != 0 && !isOCRinit) {
+          showStatus(getString(R.string.init_fail) + ":" + getString(R.string.init_ocr_fail));
+        } else {
+          mGrgSDK.openCamera(mCameraView, MainActivity.this, mOcrParam);
           showStatus("Ready — place document under camera");
-          mScanBtn.setEnabled(true);
-        });
+          resetButton();
+        }
       }
 
       @Override
@@ -97,17 +119,26 @@ public class MainActivity extends AppCompatActivity {
       @Override
       public void disconnect() {
         showStatus("Device disconnected");
-        runOnUiThread(() -> mScanBtn.setEnabled(false));
+        disableButton();
       }
 
       @Override
       public void reConnect() {
         showStatus("Device reconnected");
-        runOnUiThread(() -> mScanBtn.setEnabled(true));
+        resetButton();
       }
     });
 
+    mTakePictureBtn.setOnClickListener(v -> takePicture());
     mScanBtn.setOnClickListener(v -> scanForMrz());
+    mLoopScanBtn.setOnClickListener(v -> loopScanForMrz());
+
+    findViewById(R.id.btSimKiosk).setOnClickListener(v -> runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        btn_SimKiosk();
+      }
+    }));
     findViewById(R.id.exitBtn).setOnClickListener(v -> {
       mGrgSDK.unInit();
       finish();
@@ -137,44 +168,83 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
+  public void btn_SimKiosk() {
+    Intent intent = new Intent(MainActivity.this, SimKioskActivity.class);
+    startActivity(intent);
+  }
+
+  private void takePicture() {
+    disableButton();
+    showStatus("Capturing…");
+    mGrgSDK.startTask();
+
+    // light mode
+    // 1 - white
+    // 2 - ir
+    // 3 - uv
+    mGrgSDK.takePic(1, 300, (code, result) -> {
+      mGrgSDK.stopTask();
+      mGrgSDK.closeLed();
+      if (code != 0 || result == null || result.bitmap == null) {
+        showStatus("Capture failed (code " + code + ")");
+        resetButton();
+        return;
+      }
+
+      runOnUiThread(() -> mCurrentIv.setImageBitmap(safeCopyBitmap(result.bitmap)));
+      showStatus("Capture success!");
+      resetButton();
+    });
+  }
+
   private void scanForMrz() {
+    disableButton();
+    mMrzTv.setText("");
+    showStatus("Capturing…");
+    mGrgSDK.startTask();
+
+    mGrgSDK.takeRedPic(300, false, false, (code, result) -> {
+      if (code != 0 || result == null || result.bitmap == null) {
+        showStatus("Capture failed (code " + code + ")");
+        resetButton();
+        return;
+      }
+
+      detectMrz(safeCopyBitmap(result.bitmap));
+    });
+  }
+
+  private void loopScanForMrz() {
     mScanBtn.setEnabled(false);
     mMrzTv.setText("");
     showStatus("Capturing…");
     mGrgSDK.startTask();
 
-    mGrgSDK.takeRedPic(300, false, false, new TakePicCallBack() {
-      @Override
-      public void takePicResult(int code, TakePicResult result) {
-        if (code != 0 || result == null || result.bitmap == null) {
-          showStatus("Capture failed (code " + code + ")");
-          resetButton();
-          return;
-        }
-        Bitmap previewCopy = result.bitmap.copy(result.bitmap.getConfig(), false);
-        runOnUiThread(() -> mCurrentIv.setImageBitmap(previewCopy));
-        detectMrz(result.bitmap);
+    mGrgSDK.takeRedPic(300, true, true, (code, result) -> {
+      if (code != 0 || result == null || result.bitmap == null) {
+        showStatus("Capture failed (code " + code + ")");
+        resetButton();
+        return;
       }
+
+      detectMrz(safeCopyBitmap(result.bitmap));
     });
   }
 
   private void detectMrz(Bitmap bitmap) {
     showStatus("Running OCR…");
 
-    mGrgSDK.detectRedPic(bitmap, new DetectPicCallBack() {
-      @Override
-      public void detectPicResult(int code, DetectPicResult result) {
-        mGrgSDK.stopTask();
-        mGrgSDK.closeLed();
+    mGrgSDK.detectRedPic(bitmap, (code, result) -> {
+      mGrgSDK.stopTask();
+      mGrgSDK.closeLed();
 
-        if (code == 0 && result != null) {
-          Log.d(TAG, "MRZ: " + result.mrz);
-          runOnUiThread(() -> mMrzTv.setText(result.mrz));
-          readChip(result.mrz);
-        } else {
-          showStatus("OCR failed — no MRZ found");
-          resetButton();
-        }
+      if (code == 0 && result != null) {
+        Log.d(TAG, "MRZ: " + result.mrz);
+        runOnUiThread(() -> mMrzTv.setText(result.mrz));
+        readChip(result.mrz);
+      } else {
+        showStatus("OCR failed — no MRZ found");
+        resetButton();
       }
     });
   }
@@ -198,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
       @Override
       public void onError(int code, String message) {
         showStatus("Chip read failed: " + message);
-        if (message == "CrtSendAPDU failed, ret=-2") {
+        if (Objects.equals(message, "CrtSendAPDU failed, ret=-2")) {
           initGrg();
         }
         resetButton();
@@ -211,8 +281,26 @@ public class MainActivity extends AppCompatActivity {
     runOnUiThread(() -> mStatusTv.setText(msg));
   }
 
+  private Bitmap safeCopyBitmap(Bitmap bitmap) {
+    Bitmap safeCopy = Utils.toSoftwareBitmap(bitmap);
+    runOnUiThread(() -> mCurrentIv.setImageBitmap(safeCopy));
+    return safeCopy;
+  }
+
+  private void disableButton() {
+    runOnUiThread(() -> {
+      mTakePictureBtn.setEnabled(false);
+      mScanBtn.setEnabled(false);
+      mLoopScanBtn.setEnabled(false);
+    });
+  }
+
   private void resetButton() {
-    runOnUiThread(() -> mScanBtn.setEnabled(true));
+    runOnUiThread(() -> {
+      mTakePictureBtn.setEnabled(true);
+      mScanBtn.setEnabled(true);
+      mLoopScanBtn.setEnabled(true);
+    });
   }
 
   @Override
