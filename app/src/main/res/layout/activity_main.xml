@@ -46,11 +46,48 @@
       android:orientation="horizontal">
 
       <Button
-        android:id="@+id/takePictureBtn"
+        android:id="@+id/takePictureLightBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:enabled="false"
-        android:text="Take picture" />
+        android:text="Take picture (Light)" />
+
+      <Button
+        android:id="@+id/takePictureIrBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:text="Take picture (IR)" />
+
+      <Button
+        android:id="@+id/takePictureUvBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:text="Take picture (UV)" />
+
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center_vertical"
+      android:orientation="horizontal">
+
+      <TextView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="CARD TYPE"
+        android:fontFamily="monospace"
+        android:letterSpacing="0.1"/>
+
+      <Spinner
+        android:id="@+id/spinnerCardType"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_weight="1"
+        android:layout_marginEnd="8dp"
+        android:textSize="9sp" />
 
       <Button
         android:id="@+id/singleReadBtn"
@@ -65,6 +102,16 @@
         android:layout_height="wrap_content"
         android:enabled="false"
         android:text="Loop scan" />
+
+
+
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center_vertical"
+      android:orientation="horizontal">
 
       <Button
         android:id="@+id/btSimKiosk"

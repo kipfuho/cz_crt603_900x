@@ -752,7 +752,13 @@ public class SimKioskActivity extends Activity {
 
     int[] outLenArr = new int[]{0, 0};
 
-    result.rc = crt.R_ExeCommandS(n_Fd, commandStr, length, result.out, outLenArr);
+    try {
+      result.rc = crt.R_ExeCommandS(n_Fd, commandStr, length, result.out, outLenArr);
+    } catch (Exception e) {
+      log("R_ExeCommandS FAILED!");
+      e.printStackTrace();
+      result.rc = crt.R_ExeCommandB(n_Fd, inBuf, length, result.out, outLenArr);
+    }
     result.outLen = outLenArr[0] * 256 + outLenArr[1];
     result.ok = (result.rc == 0) && (result.outLen > 0) && (result.out[0] == 0x50);
 

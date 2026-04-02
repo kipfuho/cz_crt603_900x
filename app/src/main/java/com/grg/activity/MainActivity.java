@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
@@ -18,10 +20,14 @@ import com.grg.Utils;
 import com.grg.crt.SimplePassportReader;
 import com.grg.grglog.GrgLog;
 import com.grg.grglog.LogUtils;
+import com.grg.sdk.FaceCheckCallBack;
 import com.grg.sdk.GrgSDK;
 import com.grg.sdk.InitCallBack;
 import com.grg.sdk.OcrParam;
+import com.grg.sdk.ReadCardCallBack;
+import com.grg.sdk.TakePicCallBack;
 import com.grg.test.R;
+import com.lib.common.utils.BitmapUtils;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,9 +46,12 @@ public class MainActivity extends AppCompatActivity {
   private ImageView mCurrentIv;
   private TextView mStatusTv;
   private TextView mMrzTv;
-  private Button mTakePictureBtn;
+  private Button mTakePictureLightBtn;
+  private Button mTakePictureIrBtn;
+  private Button mTakePictureUvBtn;
   private Button mScanBtn;
   private Button mLoopScanBtn;
+  private Spinner spinnerCardType;
 
   int OcrType = 0;
   boolean isOCRinit = false;
@@ -58,12 +67,29 @@ public class MainActivity extends AppCompatActivity {
     mStatusTv = findViewById(R.id.resultTv);
     mMrzTv = findViewById(R.id.result_lv);
 
-    mTakePictureBtn = findViewById(R.id.takePictureBtn);
-    mTakePictureBtn.setEnabled(false);
+    mTakePictureLightBtn = findViewById(R.id.takePictureLightBtn);
+    mTakePictureIrBtn = findViewById(R.id.takePictureIrBtn);
+    mTakePictureUvBtn = findViewById(R.id.takePictureUvBtn);
+    mTakePictureLightBtn.setEnabled(false);
+    mTakePictureIrBtn.setEnabled(false);
+    mTakePictureUvBtn.setEnabled(false);
     mScanBtn = findViewById(R.id.singleReadBtn);
     mScanBtn.setEnabled(false);
     mLoopScanBtn = findViewById(R.id.loopReadBtn);
     mLoopScanBtn.setEnabled(false);
+
+    // Card type spinner
+    spinnerCardType = findViewById(R.id.spinnerCardType);
+    String[] cardTypes = {"id", "passport"};
+    spinnerCardType.setAdapter(
+        new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, cardTypes));
+    String intentCardType = String.valueOf(cardTypes);
+    for (int i = 0; i < cardTypes.length; i++) {
+      if (cardTypes[i].equals(intentCardType)) {
+        spinnerCardType.setSelection(i);
+        break;
+      }
+    }
 
     mOcrParam = new OcrParam();
     mGrgSDK = GrgSDK.getInstance(this);
@@ -129,7 +155,9 @@ public class MainActivity extends AppCompatActivity {
       }
     });
 
-    mTakePictureBtn.setOnClickListener(v -> takePicture());
+    mTakePictureLightBtn.setOnClickListener(v -> takePicture(1));
+    mTakePictureIrBtn.setOnClickListener(v -> takePicture(2));
+    mTakePictureUvBtn.setOnClickListener(v -> takePicture(3));
     mScanBtn.setOnClickListener(v -> scanForMrz());
     mLoopScanBtn.setOnClickListener(v -> loopScanForMrz());
 
@@ -173,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
     startActivity(intent);
   }
 
-  private void takePicture() {
+  private void takePicture(int lightMode) {
     disableButton();
     showStatus("Capturing…");
     mGrgSDK.startTask();
@@ -182,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
     // 1 - white
     // 2 - ir
     // 3 - uv
-    mGrgSDK.takePic(1, 300, (code, result) -> {
+    mGrgSDK.takePic(lightMode, 300, (code, result) -> {
       mGrgSDK.stopTask();
       mGrgSDK.closeLed();
       if (code != 0 || result == null || result.bitmap == null) {
@@ -203,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
     showStatus("Capturing…");
     mGrgSDK.startTask();
 
+    String cardType = getCardType();
     mGrgSDK.takeRedPic(300, false, false, (code, result) -> {
       if (code != 0 || result == null || result.bitmap == null) {
         showStatus("Capture failed (code " + code + ")");
@@ -210,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
         return;
       }
 
-      detectMrz(safeCopyBitmap(result.bitmap));
+      detectMrz(safeCopyBitmap(result.bitmap), cardType, false); // false = not yet flipped
     });
   }
 
@@ -220,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
     showStatus("Capturing…");
     mGrgSDK.startTask();
 
+    String cardType = getCardType();
     mGrgSDK.takeRedPic(300, true, true, (code, result) -> {
       if (code != 0 || result == null || result.bitmap == null) {
         showStatus("Capture failed (code " + code + ")");
@@ -227,22 +257,33 @@ public class MainActivity extends AppCompatActivity {
         return;
       }
 
-      detectMrz(safeCopyBitmap(result.bitmap));
+      detectMrz(safeCopyBitmap(result.bitmap), cardType, false);
     });
   }
 
-  private void detectMrz(Bitmap bitmap) {
+  private void detectMrz(Bitmap bitmap, String cardType, boolean alreadyFlipped) {
     showStatus("Running OCR…");
 
     mGrgSDK.detectRedPic(bitmap, (code, result) -> {
-      mGrgSDK.stopTask();
-      mGrgSDK.closeLed();
-
       if (code == 0 && result != null) {
+        mGrgSDK.stopTask();
+        mGrgSDK.closeLed();
         Log.d(TAG, "MRZ: " + result.mrz);
         runOnUiThread(() -> mMrzTv.setText(result.mrz));
-        readChip(result.mrz);
+        if (Objects.equals(cardType, "id")) {
+          readChip(result.mrz);
+        } else {
+          readPassport(result.mrz);
+        }
+      } else if (!alreadyFlipped) {
+        // MRZ failed — flip and retry once
+        showStatus("OCR failed — retrying flipped…");
+        Bitmap flipped = BitmapUtils.getFlipBitmap(bitmap);
+        detectMrz(flipped, cardType, true);
       } else {
+        // Already tried both orientations, give up
+        mGrgSDK.stopTask();
+        mGrgSDK.closeLed();
         showStatus("OCR failed — no MRZ found");
         resetButton();
       }
@@ -276,6 +317,46 @@ public class MainActivity extends AppCompatActivity {
     });
   }
 
+  private void readPassport(String mrz) {
+    if (mPassportReader == null) {
+      showStatus("Reader not available");
+      resetButton();
+      return;
+    }
+    showStatus("Reading passport…");
+
+    Log.d(TAG, "readPassport mrz: " + mrz);
+    mGrgSDK.readCard(mrz, new ReadCardCallBack() {
+      @Override
+      public void readCardResult(int code, ReadCardResult result) {
+        if (code == 0 && result != null) {
+          Log.d(TAG, "readPassport result: " + result.resultList);
+          runOnUiThread(() -> {
+            StringBuilder sb = new StringBuilder();
+            if (result.resultList != null) {
+              for (Object item : result.resultList) {
+                sb.append(item.toString()).append("\n");
+              }
+            }
+            mMrzTv.append("\n\n--- Passport Data ---\n" + sb);
+            if (result.face != null) {
+              mCurrentIv.setImageBitmap(result.face);
+            }
+          });
+          showStatus("Passport read OK");
+        } else {
+          showStatus("Passport read failed (code " + code + ")");
+        }
+        resetButton();
+      }
+    });
+  }
+
+  private String getCardType() {
+    String cardType = spinnerCardType.getSelectedItem().toString();
+    return cardType;
+  }
+
   private void showStatus(String msg) {
     Log.d(TAG, msg);
     runOnUiThread(() -> mStatusTv.setText(msg));
@@ -289,7 +370,9 @@ public class MainActivity extends AppCompatActivity {
 
   private void disableButton() {
     runOnUiThread(() -> {
-      mTakePictureBtn.setEnabled(false);
+      mTakePictureLightBtn.setEnabled(false);
+      mTakePictureIrBtn.setEnabled(false);
+      mTakePictureUvBtn.setEnabled(false);
       mScanBtn.setEnabled(false);
       mLoopScanBtn.setEnabled(false);
     });
@@ -297,7 +380,9 @@ public class MainActivity extends AppCompatActivity {
 
   private void resetButton() {
     runOnUiThread(() -> {
-      mTakePictureBtn.setEnabled(true);
+      mTakePictureLightBtn.setEnabled(true);
+      mTakePictureIrBtn.setEnabled(true);
+      mTakePictureUvBtn.setEnabled(true);
       mScanBtn.setEnabled(true);
       mLoopScanBtn.setEnabled(true);
     });
