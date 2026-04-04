@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  activity_sim_kiosk.xml
-  Industrial/utilitarian aesthetic — dark chrome panels, amber accent, monospace data.
-  Designed for a kiosk / POS terminal form factor (landscape, touch-friendly targets).
--->
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:orientation="horizontal"
   android:background="#0D0F0E">
 
   <!-- ═══════════════════════════════════════════════════════════════
-       LEFT PANEL — card info + primary actions
+       LEFT PANEL — connection + card info + transport
        ═══════════════════════════════════════════════════════════════ -->
   <LinearLayout
     android:layout_width="0dp"
     android:layout_height="match_parent"
     android:layout_weight="1"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="14dp">
 
     <!-- ── Header ──────────────────────────────────────────────── -->
     <LinearLayout
@@ -31,16 +27,16 @@
 
       <View
         android:layout_width="4dp"
-        android:layout_height="28dp"
+        android:layout_height="26dp"
         android:background="#F0A500"
         android:layout_marginEnd="10dp"/>
 
       <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SIM KIOSK"
+        android:text="@string/sim_kiosk"
         android:textColor="#F0A500"
-        android:textSize="18sp"
+        android:textSize="17sp"
         android:letterSpacing="0.15"
         android:fontFamily="monospace"
         android:textStyle="bold"/>
@@ -54,16 +50,16 @@
 
     </LinearLayout>
 
-    <!-- ── Connection settings (spinners + connect buttons) ──── -->
+    <!-- ── Connection panel ─────────────────────────────────────── -->
     <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="vertical"
       android:background="#141918"
       android:padding="10dp"
-      android:layout_marginBottom="10dp">
+      android:layout_marginBottom="8dp">
 
-      <!-- Row 1: Port + Baud spinners -->
+      <!-- Row 1: PORT + BAUD -->
       <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -74,45 +70,39 @@
         <TextView
           android:layout_width="36dp"
           android:layout_height="wrap_content"
-          android:text="PORT"
+          android:text="@string/port"
           android:textColor="#6B7573"
-          android:textSize="9sp"
-          android:fontFamily="monospace"
-          android:letterSpacing="0.1"/>
+          android:textSize="11sp"
+          android:fontFamily="monospace"/>
 
         <Spinner
           android:id="@+id/spinnerSimPort"
           android:layout_width="0dp"
-          android:layout_height="36dp"
+          android:layout_height="34dp"
           android:layout_weight="1"
           android:layout_marginEnd="8dp"
           android:background="#1E2422"
-          android:popupBackground="#1E2422"
-          android:textColor="#6B7573"
-          android:textSize="9sp" />
+          android:popupBackground="#1E2422"/>
 
         <TextView
           android:layout_width="36dp"
           android:layout_height="wrap_content"
-          android:text="BAUD"
+          android:text="@string/baud"
           android:textColor="#6B7573"
-          android:textSize="9sp"
-          android:fontFamily="monospace"
-          android:letterSpacing="0.1"/>
+          android:textSize="11sp"
+          android:fontFamily="monospace"/>
 
         <Spinner
           android:id="@+id/spinnerSimBaud"
           android:layout_width="0dp"
-          android:layout_height="36dp"
+          android:layout_height="34dp"
           android:layout_weight="1"
           android:background="#1E2422"
-          android:popupBackground="#1E2422"
-          android:textColor="#6B7573"
-          android:textSize="9sp" />
+          android:popupBackground="#1E2422"/>
 
       </LinearLayout>
 
-      <!-- Row 2: Addr spinner + Connect/Disconnect buttons -->
+      <!-- Row 2: ADDR + status label + CONNECT / DISC buttons -->
       <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -122,17 +112,15 @@
         <TextView
           android:layout_width="36dp"
           android:layout_height="wrap_content"
-          android:text="ADDR"
+          android:text="@string/addr"
           android:textColor="#6B7573"
-          android:textSize="9sp"
-          android:fontFamily="monospace"
-          android:letterSpacing="0.1"/>
+          android:textSize="11sp"
+          android:fontFamily="monospace"/>
 
         <Spinner
           android:id="@+id/spinnerSimAddr"
-          android:layout_width="0dp"
-          android:layout_height="36dp"
-          android:layout_weight="1"
+          android:layout_width="80dp"
+          android:layout_height="34dp"
           android:layout_marginEnd="8dp"
           android:background="#1E2422"
           android:popupBackground="#1E2422"/>
@@ -142,241 +130,230 @@
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:layout_weight="1"
-          android:text="Not connected"
+          android:text="@string/not_connected"
           android:textColor="#CF6679"
-          android:textSize="10sp"
+          android:textSize="11sp"
           android:fontFamily="monospace"
           android:layout_marginEnd="6dp"/>
 
         <Button
           android:id="@+id/btnSimConnect"
           android:layout_width="wrap_content"
-          android:layout_height="36dp"
-          android:text="CONNECT"
+          android:layout_height="34dp"
+          android:text="@string/connect"
           android:textColor="#0D0F0E"
-          android:textSize="10sp"
+          android:textSize="11sp"
           android:fontFamily="monospace"
           android:backgroundTint="#8EC97A"
-          android:paddingStart="12dp"
-          android:paddingEnd="12dp"
+          android:paddingStart="10dp"
+          android:paddingEnd="10dp"
           android:layout_marginEnd="4dp"/>
 
         <Button
           android:id="@+id/btnSimDisconnect"
           android:layout_width="wrap_content"
-          android:layout_height="36dp"
-          android:text="DISC."
+          android:layout_height="34dp"
+          android:text="@string/disconnect"
           android:textColor="#E8EBE9"
-          android:textSize="10sp"
+          android:textSize="11sp"
           android:fontFamily="monospace"
           android:backgroundTint="#2A2E2C"
-          android:paddingStart="12dp"
-          android:paddingEnd="12dp"/>
+          android:paddingStart="10dp"
+          android:paddingEnd="10dp"/>
 
       </LinearLayout>
 
     </LinearLayout>
 
-    <!-- ── ICCID card ───────────────────────────────────────────── -->
+    <!-- ── ICCID + Stock level row ──────────────────────────────── -->
     <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:orientation="vertical"
-      android:background="#141918"
-      android:padding="14dp"
-      android:layout_marginBottom="10dp">
-
-      <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ICCID"
-        android:textColor="#6B7573"
-        android:textSize="10sp"
-        android:letterSpacing="0.2"
-        android:fontFamily="monospace"/>
-
-      <TextView
-        android:id="@+id/tvIccid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="—"
-        android:textColor="#E8EBE9"
-        android:textSize="16sp"
-        android:fontFamily="monospace"
-        android:layout_marginTop="4dp"
-        android:letterSpacing="0.05"/>
-
-    </LinearLayout>
-
-    <!-- ── Slot count card ─────────────────────────────────────── -->
-    <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
+      android:baselineAligned="false"
       android:orientation="horizontal"
-      android:background="#141918"
-      android:padding="14dp"
-      android:gravity="center_vertical"
-      android:layout_marginBottom="10dp">
+      android:layout_marginBottom="8dp">
 
+      <!-- ICCID -->
       <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:orientation="vertical"
+        android:background="#141918"
+        android:padding="12dp"
+        android:layout_marginEnd="6dp">
 
         <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="CARDS IN HOLDER"
+          android:text="@string/iccid"
           android:textColor="#6B7573"
-          android:textSize="10sp"
-          android:letterSpacing="0.2"
-          android:fontFamily="monospace"/>
+          android:textSize="11sp"
+          android:fontFamily="monospace"
+          android:letterSpacing="0.2"/>
 
         <TextView
-          android:id="@+id/tvSlotCount"
+          android:id="@+id/tvIccid"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="—"
+          android:text="@string/slash"
+          android:textColor="#E8EBE9"
+          android:textSize="13sp"
+          android:fontFamily="monospace"
+          android:layout_marginTop="4dp"/>
+
+      </LinearLayout>
+
+      <!-- Stock level -->
+      <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="#141918"
+        android:padding="12dp"
+        android:gravity="center">
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/stock"
+          android:textColor="#6B7573"
+          android:textSize="11sp"
+          android:fontFamily="monospace"
+          android:letterSpacing="0.2"/>
+
+        <TextView
+          android:id="@+id/tvStockLevel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/slash"
           android:textColor="#F0A500"
-          android:textSize="28sp"
+          android:textSize="18sp"
           android:fontFamily="monospace"
           android:textStyle="bold"
           android:layout_marginTop="2dp"/>
 
       </LinearLayout>
 
-      <Button
-        android:id="@+id/btnCountSlots"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:text="COUNT"
-        android:textColor="#0D0F0E"
-        android:textSize="11sp"
-        android:letterSpacing="0.1"
-        android:fontFamily="monospace"
-        android:backgroundTint="#F0A500"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"/>
-
     </LinearLayout>
 
-    <!-- ── Status bar ──────────────────────────────────────────── -->
+    <!-- ── Status ───────────────────────────────────────────────── -->
     <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="vertical"
       android:background="#141918"
-      android:padding="12dp"
-      android:layout_marginBottom="16dp">
+      android:padding="10dp"
+      android:layout_marginBottom="10dp">
 
       <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="STATUS"
+        android:text="@string/status"
         android:textColor="#6B7573"
-        android:textSize="10sp"
-        android:letterSpacing="0.2"
-        android:fontFamily="monospace"/>
+        android:textSize="11sp"
+        android:fontFamily="monospace"
+        android:letterSpacing="0.2"/>
 
       <TextView
         android:id="@+id/tvSimStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Initialising…"
+        android:text="@string/initialising"
         android:textColor="#8EC97A"
-        android:textSize="12sp"
+        android:textSize="11sp"
         android:fontFamily="monospace"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="3dp"
         android:maxLines="2"/>
 
     </LinearLayout>
 
-    <!-- ── Primary actions ─────────────────────────────────────── -->
+    <!-- ── Section label: DISPENSER ─────────────────────────────── -->
     <TextView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="CARD TRANSPORT"
+      android:text="@string/dispenser"
       android:textColor="#6B7573"
-      android:textSize="10sp"
+      android:textSize="11sp"
       android:letterSpacing="0.2"
       android:fontFamily="monospace"
-      android:layout_marginBottom="8dp"/>
+      android:layout_marginBottom="6dp"/>
 
-    <!-- Read ICCID (most important — full width, accent) -->
+    <!-- READ ICCID — primary CTA -->
     <Button
       android:id="@+id/btnReadIccid"
       android:layout_width="match_parent"
-      android:layout_height="56dp"
-      android:text="▶  READ ICCID"
+      android:layout_height="50dp"
+      android:text="@string/read_iccid"
       android:textColor="#0D0F0E"
-      android:textSize="13sp"
-      android:letterSpacing="0.08"
+      android:textSize="12sp"
       android:fontFamily="monospace"
       android:textStyle="bold"
       android:backgroundTint="#F0A500"
-      android:layout_marginBottom="8dp"/>
+      android:layout_marginBottom="6dp"/>
 
-    <!-- Push + Retract side by side -->
+    <!-- CHECK STOCK + DISPENSE -->
     <LinearLayout
+      style="?android:attr/buttonBarStyle"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="horizontal"
-      android:layout_marginBottom="8dp">
+      android:layout_marginBottom="6dp">
 
       <Button
-        android:id="@+id/btnPushToFront"
+        android:id="@+id/btnCheckStock"
         android:layout_width="0dp"
-        android:layout_height="52dp"
+        android:layout_height="46dp"
         android:layout_weight="1"
-        android:layout_marginEnd="6dp"
-        android:text="⏩  PUSH TO GATE"
-        android:textColor="#E8EBE9"
+        android:layout_marginEnd="5dp"
+        android:text="@string/check_stock"
+        android:textColor="#F0A500"
         android:textSize="11sp"
-        android:letterSpacing="0.05"
         android:fontFamily="monospace"
-        android:backgroundTint="#1E2422"/>
+        android:backgroundTint="#1E2422" />
 
       <Button
-        android:id="@+id/btnRetract"
+        android:id="@+id/btnDispense"
         android:layout_width="0dp"
-        android:layout_height="52dp"
+        android:layout_height="46dp"
         android:layout_weight="1"
-        android:layout_marginStart="6dp"
-        android:text="⏪  RETRACT"
+        android:layout_marginStart="5dp"
+        android:text="@string/dispense"
         android:textColor="#E8EBE9"
         android:textSize="11sp"
-        android:letterSpacing="0.05"
         android:fontFamily="monospace"
         android:backgroundTint="#1E2422"/>
 
     </LinearLayout>
 
-    <!-- Cold reset + Deactivate side by side -->
+    <!-- PUSH TO GATE + FULL EJECT -->
     <LinearLayout
+      style="?android:attr/buttonBarStyle"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:orientation="horizontal">
+      android:orientation="horizontal"
+      android:layout_marginBottom="6dp">
 
       <Button
-        android:id="@+id/btnSimColdReset"
+        android:id="@+id/btnPushToGate"
         android:layout_width="0dp"
-        android:layout_height="48dp"
+        android:layout_height="46dp"
         android:layout_weight="1"
-        android:layout_marginEnd="6dp"
-        android:text="COLD RESET"
+        android:layout_marginEnd="5dp"
+        android:text="@string/push_to_gate"
         android:textColor="#E8EBE9"
         android:textSize="11sp"
         android:fontFamily="monospace"
-        android:backgroundTint="#1E2422"/>
+        android:backgroundTint="#1E2422" />
 
       <Button
-        android:id="@+id/btnSimDeactivate"
+        android:id="@+id/btnEjectFull"
         android:layout_width="0dp"
-        android:layout_height="48dp"
+        android:layout_height="46dp"
         android:layout_weight="1"
-        android:layout_marginStart="6dp"
-        android:text="DEACTIVATE"
+        android:layout_marginStart="5dp"
+        android:text="@string/full_eject"
         android:textColor="#CF6679"
         android:textSize="11sp"
         android:fontFamily="monospace"
@@ -384,16 +361,82 @@
 
     </LinearLayout>
 
+    <!-- RETRACT + RECYCLE -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:layout_marginBottom="6dp">
+
+      <Button
+        android:id="@+id/btnRetract"
+        android:layout_width="0dp"
+        android:layout_height="46dp"
+        android:layout_weight="1"
+        android:layout_marginEnd="5dp"
+        android:text="@string/retract"
+        android:textColor="#E8EBE9"
+        android:textSize="11sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#1E2422"/>
+
+      <Button
+        android:id="@+id/btnRecycle"
+        android:layout_width="0dp"
+        android:layout_height="46dp"
+        android:layout_weight="1"
+        android:layout_marginStart="5dp"
+        android:text="@string/recycle"
+        android:textColor="#E8EBE9"
+        android:textSize="11sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#1E2422"/>
+
+    </LinearLayout>
+
+    <!-- ENABLE ENTRY + DISABLE ENTRY -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal">
+
+      <Button
+        android:id="@+id/btnEnableEntry"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_weight="1"
+        android:layout_marginEnd="5dp"
+        android:text="@string/entry_on"
+        android:textColor="#8EC97A"
+        android:textSize="11sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#1E2422"/>
+
+      <Button
+        android:id="@+id/btnDisableEntry"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_weight="1"
+        android:layout_marginStart="5dp"
+        android:text="@string/entry_off"
+        android:textColor="#CF6679"
+        android:textSize="11sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#1E2422"/>
+
+    </LinearLayout>
+
+    <!-- Spacer + Back -->
     <View
       android:layout_width="0dp"
       android:layout_height="0dp"
-      android:layout_weight="1"/>
+      android:layout_weight="1"
+      tools:ignore="NestedWeights" />
 
-    <!-- Back button -->
     <Button
       android:id="@+id/btnSimBack"
       android:layout_width="match_parent"
-      android:layout_height="44dp"
+      android:layout_height="40dp"
       android:text="← BACK"
       android:textColor="#6B7573"
       android:textSize="11sp"
@@ -410,49 +453,120 @@
     android:background="#1E2422"/>
 
   <!-- ═══════════════════════════════════════════════════════════════
-       RIGHT PANEL — device utilities + log
+       RIGHT PANEL — IC chip + device queries + log
        ═══════════════════════════════════════════════════════════════ -->
   <LinearLayout
     android:layout_width="0dp"
     android:layout_height="match_parent"
     android:layout_weight="1"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="14dp">
 
-    <!-- ── Device utilities ────────────────────────────────────── -->
+    <!-- ── Section: IC CHIP ─────────────────────────────────────── -->
     <LinearLayout
-      android:layout_width="wrap_content"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:gravity="center_vertical"
-      android:paddingBottom="10dp">
+      android:paddingBottom="8dp">
 
       <View
         android:layout_width="4dp"
-        android:layout_height="20dp"
+        android:layout_height="18dp"
+        android:background="#F0A500"
+        android:layout_marginEnd="8dp"/>
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IC CHIP"
+        android:textColor="#F0A500"
+        android:textSize="11sp"
+        android:letterSpacing="0.2"
+        android:fontFamily="monospace"/>
+
+    </LinearLayout>
+
+    <!-- COLD RESET + WARM RESET + DEACTIVATE -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:layout_marginBottom="10dp">
+
+      <Button
+        android:id="@+id/btnSimColdReset"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_weight="1"
+        android:layout_marginEnd="4dp"
+        android:text="COLD RST"
+        android:textColor="#E8EBE9"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#141918"/>
+
+      <Button
+        android:id="@+id/btnSimWarmReset"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_weight="1"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:text="WARM RST"
+        android:textColor="#E8EBE9"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#141918"/>
+
+      <Button
+        android:id="@+id/btnSimDeactivate"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_weight="1"
+        android:layout_marginStart="4dp"
+        android:text="DEACT."
+        android:textColor="#CF6679"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#141918"/>
+
+    </LinearLayout>
+
+    <!-- ── Section: DEVICE ──────────────────────────────────────── -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center_vertical"
+      android:paddingBottom="8dp">
+
+      <View
+        android:layout_width="4dp"
+        android:layout_height="18dp"
         android:background="#3A7BFF"
-        android:layout_marginEnd="10dp"/>
+        android:layout_marginEnd="8dp"/>
 
       <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="DEVICE"
         android:textColor="#3A7BFF"
-        android:textSize="12sp"
+        android:textSize="11sp"
         android:letterSpacing="0.2"
         android:fontFamily="monospace"/>
 
     </LinearLayout>
 
+    <!-- STATUS + SENSORS -->
     <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="horizontal"
-      android:layout_marginBottom="8dp">
+      android:layout_marginBottom="4dp">
 
       <Button
         android:id="@+id/btnSimQueryStatus"
         android:layout_width="0dp"
-        android:layout_height="44dp"
+        android:layout_height="40dp"
         android:layout_weight="1"
         android:layout_marginEnd="4dp"
         android:text="STATUS"
@@ -464,11 +578,44 @@
       <Button
         android:id="@+id/btnSimQuerySensors"
         android:layout_width="0dp"
-        android:layout_height="44dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:layout_marginStart="4dp"
+        android:text="SENSORS"
+        android:textColor="#E8EBE9"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#141918"/>
+
+    </LinearLayout>
+
+    <!-- SERIAL + CONFIG + FIRMWARE -->
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:layout_marginBottom="10dp">
+
+      <Button
+        android:id="@+id/btnSimSerialNumber"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:layout_marginEnd="4dp"
+        android:text="SERIAL"
+        android:textColor="#E8EBE9"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:backgroundTint="#141918"/>
+
+      <Button
+        android:id="@+id/btnSimDeviceConfig"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
         android:layout_weight="1"
         android:layout_marginStart="4dp"
         android:layout_marginEnd="4dp"
-        android:text="SENSORS"
+        android:text="CONFIG"
         android:textColor="#E8EBE9"
         android:textSize="10sp"
         android:fontFamily="monospace"
@@ -477,7 +624,7 @@
       <Button
         android:id="@+id/btnSimFirmware"
         android:layout_width="0dp"
-        android:layout_height="44dp"
+        android:layout_height="40dp"
         android:layout_weight="1"
         android:layout_marginStart="4dp"
         android:text="FIRMWARE"
@@ -488,20 +635,19 @@
 
     </LinearLayout>
 
-    <!-- ── Log header ──────────────────────────────────────────── -->
+    <!-- ── Section: LOG ─────────────────────────────────────────── -->
     <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="horizontal"
       android:gravity="center_vertical"
-      android:layout_marginTop="8dp"
       android:layout_marginBottom="6dp">
 
       <View
         android:layout_width="4dp"
-        android:layout_height="20dp"
+        android:layout_height="18dp"
         android:background="#3A7BFF"
-        android:layout_marginEnd="10dp"/>
+        android:layout_marginEnd="8dp"/>
 
       <TextView
         android:layout_width="0dp"
@@ -509,25 +655,25 @@
         android:layout_weight="1"
         android:text="COMMAND LOG"
         android:textColor="#3A7BFF"
-        android:textSize="12sp"
+        android:textSize="11sp"
         android:letterSpacing="0.2"
         android:fontFamily="monospace"/>
 
       <Button
         android:id="@+id/btnSimClearLog"
         android:layout_width="wrap_content"
-        android:layout_height="32dp"
+        android:layout_height="30dp"
         android:text="CLEAR"
         android:textColor="#6B7573"
         android:textSize="10sp"
         android:fontFamily="monospace"
         android:backgroundTint="#141918"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"/>
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"/>
 
     </LinearLayout>
 
-    <!-- ── Scrollable log ──────────────────────────────────────── -->
+    <!-- Log TextView -->
     <ScrollView
       android:layout_width="match_parent"
       android:layout_height="0dp"
@@ -543,8 +689,7 @@
         android:textColor="#8EC97A"
         android:textSize="11sp"
         android:fontFamily="monospace"
-        android:lineSpacingMultiplier="1.3"
-        android:scrollbars="vertical"/>
+        android:lineSpacingMultiplier="1.3"/>
 
     </ScrollView>
 

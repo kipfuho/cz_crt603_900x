@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CRT603_900X</string>
+    <string name="app_name">Kiosk Demo</string>
     <string name="exit">Exit</string>
     <string name="click_yellow">Please click on all yellow buttons</string>
     <string name="usb_out">USB unplugged detected</string>
@@ -456,4 +456,24 @@
     <string name="timeout">Timeout</string>
     <string name="scan_taking">Scan taking: </string>
     <string name="scan_failed_taking">Scan failed taking: </string>
+  <string name="sim_kiosk">SIM KIOSK</string>
+    <string name="port">PORT</string>
+    <string name="baud">BAUD</string>
+    <string name="addr">ADDR</string>
+    <string name="not_connected">Not connected</string>
+    <string name="iccid">ICCID</string>
+    <string name="slash">—</string>
+    <string name="stock">STOCK</string>
+    <string name="status">STATUS</string>
+    <string name="initialising">Initialising…</string>
+    <string name="dispenser">DISPENSER</string>
+    <string name="read_iccid">▶ READ ICCID</string>
+    <string name="check_stock">CHECK STOCK</string>
+    <string name="dispense">⏏ DISPENSE</string>
+    <string name="push_to_gate">⏩ PUSH TO GATE</string>
+    <string name="full_eject">⏭ FULL EJECT</string>
+    <string name="retract">⏪ RETRACT</string>
+    <string name="recycle">♻ RECYCLE</string>
+    <string name="entry_on">ENTRY ON</string>
+    <string name="entry_off">ENTRY OFF</string>
 </resources>

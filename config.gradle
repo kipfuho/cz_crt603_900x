@@ -1,13 +1,11 @@
 // Third-party libraries, App version number management, and component mode switching configuration
 ext {
 
-    android = [
-            compileSdkVersion: 33,
-            minSdkVersion    : 29,
-            targetSdkVersion : 33,
-            versionCode      : 29,
-            versionName      : "1.0.853",
-    ]
+    android = [compileSdkVersion: 33,
+               minSdkVersion    : 29,
+               targetSdkVersion : 33,
+               versionCode      : 29,
+               versionName      : "1.0.0",]
 
 
     libsVersion = [
@@ -72,6 +70,5 @@ ext {
             // GRG fill light library
             grg_leds005            : "com.grg:lib_led_s005:$rootProject.grg_leds005",
             recycler_adapter_helper: "com.github.CymChad:BaseRecyclerViewAdapterHelper:$rootProject.recycler_adapter_helper",
-            dbinspector            : "im.dino:dbinspector:3.4.1@aar"
-    ]
+            dbinspector            : "im.dino:dbinspector:3.4.1@aar"]
 }

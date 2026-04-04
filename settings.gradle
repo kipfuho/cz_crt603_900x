@@ -1,4 +1,2 @@
-rootProject.name = "CZ_CRT603_900X_Demo"
+rootProject.name = "Kiosk_Demo_App"
 include ':app'
-
-

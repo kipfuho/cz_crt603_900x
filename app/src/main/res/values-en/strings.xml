@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CRT603_900X</string>
+    <string name="app_name">Kiosk Demo</string>
     <string name="exit">Exit</string>
     <string name="click_yellow">Please click on all yellow buttons</string>
     <string name="usb_out">USB unplugged detected</string>
