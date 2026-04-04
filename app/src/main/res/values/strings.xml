@@ -1,402 +1,459 @@
 <resources>
-  <string name="app_name">CRT603_900X</string>
-  <string name="exit">退出</string>
-  <string name="click_yellow">请点击所有的黄色按钮</string>
-  <string name="usb_out">检测到USB拔出</string>
-  <string name="usb_in">检测到USB插入</string>
-  <string name="face_check_no_support">只有双目摄像头才支持活体检测</string>
-  <string name="no_camera0">没有检测到可见光摄像头</string>
-  <string name="stoping">停止中</string>
-  <string name="please_stop">请先停止</string>
-  <string name="no_camera1">没有检测到红外光摄像头</string>
-  <string name="module_screen">屏幕检测</string>
-  <string name="module_blur">模糊度检测</string>
-  <string name="module_ocr">OCR检测</string>
-  <string name="module_ocr_zs">OCR</string>
-  <string name="module_cz_card">创自读卡器</string>
-  <string name="module_camera">摄像头检测</string>
-  <string name="module_camera_resolution">分辨率检测</string>
-  <string name="module_sec">副屏测试</string>
-  <string name="module_card">读卡器检测</string>
-  <string name="module_face_check">人脸检测</string>
-  <string name="module_finger">指纹检测</string>
-  <string name="module_led">LED灯检测</string>
-  <string name="module_net">网络检测</string>
-  <string name="module_usb">USB检测</string>
-  <string name="module_voice">喇叭检测</string>
-  <string name="module_aging">老化检测</string>
-  <string name="module_version">版本检测</string>
-  <string name="module_camera_aging">摄像头老化</string>
-  <string name="module_key0">键盘检测 0</string>
-  <string name="module_key1">键盘检测 1</string>
-  <string name="module_key2">键盘检测 2</string>
-  <string name="module_passport">护照识别</string>
-  <string name="module_sign">手写检测</string>
-
-
-  <string name="display_test">显示检测</string>
-  <string name="touch_test">触摸检测</string>
-  <string name="idcard_test">身份证检测</string>
-  <string name="nfc_test">非接卡检测</string>
-  <string name="connect_device">连接设备</string>
-  <string name="close_device">关闭设备</string>
-  <string name="enroll_finger">录入指纹</string>
-  <string name="compare_finger">对比指纹</string>
-  <string name="clear_finger">清空指纹库</string>
-
-  <string name="back">返回</string>
-  <string name="close">关闭</string>
-  <string name="start">开启</string>
-
-  <string name="intranet_setting">以太网设置</string>
-  <string name="wifi_setting">无线网设置</string>
-  <string name="device_list">USB设备列表</string>
-
-  <string name="adjust_voice">调节音量</string>
-  <string name="play">开始播放</string>
-  <string name="stop">停止播放</string>
-  <string name="self_test_num">自检次数</string>
-  <string name="start_time">测试开始时间：</string>
-  <string name="during_time">测试持续时间：</string>
-  <string name="id_card_module">身份证模块</string>
-  <string name="hardware_tool">硬件检测工具</string>
-  <string name="change">语言切换</string>
-  <string name="name">OcrTest</string>
-
-  <string name="top_msg">在密码键盘输入数字</string>
-  <string name="camera1">检测到</string>
-  <string name="camera2">个摄像头，选择序号后打开</string>
-  <string name="no_camera">没有检测到摄像头</string>
-  <string name="camera">摄像头</string>
-  <string name="camera_0">可见光</string>
-  <string name="camera_1">红外光</string>
-  <string name="camera_2">OCR</string>
-  <string name="open">打开</string>
-  <string name="no_selecte_camera">没有选择摄像头</string>
-  <string name="too_many_camera">选择摄像头过多</string>
-  <string name="camera_selected">已经选择摄像头</string>
-  <string name="local_ip">本机IP地址：</string>
-
-  <string name="get_ip_failed">获取IP地址失败，请检查网络设置</string>
-  <string name="complete">完成</string>
-  <string name="restart">是否重启</string>
-  <string name="resSys">重启系统</string>
-  <string name="yes">是</string>
-  <string name="no">否</string>
-  <string name="connection_ok">连接成功</string>
-  <string name="finger_ok"> 指纹模块：正常</string>
-  <string name="finger_failed"> 指纹模块：异常</string>
-
-  <string name="idcard_ok"> 身份证模块：正常</string>
-  <string name="passport_ok"> 护照模块：正常</string>
-  <string name="passport_failed"> 护照模块：异常</string>
-  <string name="czcard_ok"> 创自读卡器模块：正常</string>
-  <string name="idcard_failed"> 身份证模块：异常</string>
-  <string name="czcard_failed"> 创自读卡器模块：异常</string>
-
-  <string name="camera_ok"> 摄像头模块：正常</string>
-  <string name="camera_failed"> 摄像头模块：异常</string>
-
-  <string name="test"> 测试：</string>
-  <string name="failed_time">次，异常 </string>
-  <string name="times">次 </string>
-  <string name="camera_mouled"> 摄像头模块： </string>
-
-  <string name="stop1">停止中...</string>
-  <string name="connect_suc">模块连接成功</string>
-  <string name="connect_failed">模块连接失败</string>
-  <string name="connect_first">请先连接设备</string>
-
-  <string name="self_test">自检项目</string>
-  <string name="self_test_idcard">身份证模块</string>
-  <string name="self_test_camera0">摄像头 0</string>
-  <string name="self_test_camera1">摄像头 1</string>
-  <string name="self_test_camera2">摄像头 2</string>
-  <string name="self_test_finger">指纹模块</string>
-  <string name="self_test_ethernet">有线网络是否连接</string>
-  <string name="self_test_wifi">无线网络是否连接</string>
-  <string name="self_test_keyboard">外接密码键盘</string>
-  <string name="self_test_tips">备注：检测涵盖所有模块，不同产品之间存在模块不一致问题请根据实际产品查看检测结果</string>
-  <string name="self_test_confirm">确定</string>
-
-  <string name="box_score_thresh">框置信度门限</string>
-  <string name="box_un_clip_ratio">框大小倍率</string>
-  <string name="app_permission">获取相机权限</string>
-  <string name="storage_permission">获取存储权限</string>
-  <string name="do_angle">文字方向检测</string>
-
-  <string name="ocr_add">新增</string>
-  <string name="ocr_delete">删除</string>
-  <string name="ocr_clear">清除</string>
-  <string name="ocr_identify">识别</string>
-  <string name="ocr_result">结果</string>
-  <string name="ocr_result_tips">识别结果</string>
-  <string name="ocr_confirm">确定</string>
-
-  <string name="select_pic">选择图片</string>
-
-  <string name="take_pic">开始拍照</string>
-
-  <string name="passport_num">卡号</string>
-  <string name="passport_birthday">出生日期</string>
-  <string name="passport_endtime">过期日期</string>
-
-  <string name="memory">内存：</string>
-  <string name="storage">存储：</string>
-  <string name="system">系统：</string>
-  <string name="tips">提示</string>
-  <string name="loding">加载中</string>
-  <string name="excel_content">是否需要导出结果到Excel</string>
-  <string name="stop_test">是否停止测试并且重启应用</string>
-  <string name="file_path">文件路径：</string>
-
-  <string name="test_time">自检时间</string>
-  <string name="test_times">自检次数</string>
-  <string name="test_camera">摄像头模块</string>
-  <string name="test_finger">指纹模块</string>
-  <string name="test_cz">创自非接模块</string>
-  <string name="test_max2">德卡身份证模块</string>
-
-  <string name="change_languages">语言</string>
-  <string name="open_cn_ocr">开启中文OCR</string>
-  <string name="open_aging_test">开启老化测试</string>
-  <string name="is_sec">这是副屏</string>
+    <string name="app_name">CRT603_900X</string>
+    <string name="exit">Exit</string>
+    <string name="click_yellow">Please click on all yellow buttons</string>
+    <string name="usb_out">USB unplugged detected</string>
+    <string name="usb_in">USB insertion detected</string>
+    <string name="face_check_no_support">Only binocular cameras support live detection</string>
+    <string name="module_screen">Screen Test</string>
+    <string name="module_blur">Blur Test</string>
+    <string name="module_sec">Sec Screen Test</string>
+    <string name="no_camera0">No visible light cameras detected</string>
+    <string name="no_camera1">No infrared camera detected</string>
+    <string name="stoping">stoping</string>
+    <string name="please_stop">please stop first</string>
+    <string name="module_ocr">OCR Test</string>
+    <string name="module_ocr_zs">OCR</string>
+    <string name="module_cz_card">CZ Card</string>
+    <string name="module_camera">Camera Test</string>
+    <string name="module_camera_resolution">Resolution Test</string>
+    <string name="module_card">Card Test</string>
+    <string name="module_face_check">Face Check Test</string>
+    <string name="module_finger">Finger print Test</string>
+    <string name="module_led">LED light Test</string>
+    <string name="module_net">Network Test</string>
+    <string name="module_usb">USB Test</string>
+    <string name="module_voice">Audio Test</string>
+    <string name="module_aging">Aging Test</string>
+    <string name="module_version">Version Check</string>
+    <string name="module_camera_aging">Camera Aging</string>
+    <string name="module_key0">Keyboard 0 Test</string>
+    <string name="module_key1">Keyboard 1 Test</string>
+    <string name="module_key2">Keyboard 2 Test</string>
+    <string name="module_sign">Sign Test</string>
+    <string name="module_passport">Passport identification</string>
+
+    <string name="back">return</string>
+    <string name="take_photo_blur">Take Photo</string>
+    <string name="display_test">Display Test</string>
+    <string name="touch_test">Touch Test</string>
+    <string name="idcard_test">ID card Test</string>
+    <string name="nfc_test">NFC Test</string>
+
+    <string name="close_device">Close device</string>
+
+    <string name="connect_device">Device Connection</string>
+    <string name="enroll_finger">Finger Enrollment</string>
+    <string name="compare_finger">Finger Verification</string>
+    <string name="clear_finger">Clear Database</string>
+
+    <string name="close">Shut Down</string>
+    <string name="start">Start Up</string>
+
+    <string name="intranet_setting">Intranet Configuration</string>
+    <string name="wifi_setting">WIFI Configuration</string>
+    <string name="device_list">USB Device List</string>
+
+    <string name="adjust_voice">Sound Adjustment</string>
+    <string name="play">Play</string>
+    <string name="stop">Stop</string>
+    <string name="start_time">Start Time:</string>
+    <string name="during_time">During Time:</string>
+    <string name="self_test_num">Self-test Amount</string>
+    <string name="id_card_module">ID card Module</string>
+    <string name="hardware_tool">Hardware Test Tool</string>
+    <string name="name">Test</string>
+    <string name="change">Switch language</string>
+    <string name="top_msg">Enter numbers on the password keypad</string>
+    <string name="camera1">camera</string>
+    <string name="camera2"> camera is detected, open it after selecting the serial number</string>
+    <string name="no_camera">No camera detected</string>
+    <string name="camera">Camera</string>
+    <string name="open">Open</string>
+    <string name="no_selecte_camera"> No camera selected</string>
+    <string name="too_many_camera">Too many cameras selected</string>
+    <string name="camera_selected"> Camera selected</string>
+    <string name="local_ip">Local IP address：</string>
+    <string name="get_ip_failed">Get local IP failed，Please check the network settings</string>
+    <string name="complete">complete</string>
+    <string name="restart">Restart</string>
+    <string name="resSys">RestartSystem</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="connection_ok">Connection succeeded </string>
+
+    <string name="finger_ok"> Fingerprint module: normal &#160;&#160;</string>
+    <string name="finger_failed">Fingerprint module: abnormal&#160;&#160;</string>
+
+    <string name="idcard_ok"> IDCard module: normal &#160;&#160;</string>
+    <string name="passport_ok"> Passport module: normal &#160;&#160;</string>
+    <string name="passport_failed"> Passport module: abnormal &#160;&#160;</string>
+    <string name="czcard_ok"> CZCard module: normal &#160;&#160;</string>
+    <string name="idcard_failed"> IDCard module: abnormal&#160;&#160;</string>
+    <string name="czcard_failed"> CZCard module: abnormal&#160;&#160;</string>
+
+    <string name="camera_ok"> Camera module: normal &#160;&#160;</string>
+    <string name="camera_failed">Camera module: abnormal &#160;&#160;</string>
+    <string name="failed_time">times, abnormal&#160;&#160;</string>
+    <string name="test"> Test：</string>
+    <string name="times">&#160;times </string>
+    <string name="camera_mouled">Camera module:  </string>
+    <string name="stop1">stopping</string>
+
+    <string name="connect_suc">Connect success</string>
+    <string name="connect_failed">Connect failed</string>
+    <string name="connect_first">Connect device first</string>
+
+    <string name="self_test">self-inspection</string>
+    <string name="self_test_idcard">ID card module</string>
+    <string name="self_test_camera0">Camera 0</string>
+    <string name="self_test_camera1">Camera 1</string>
+    <string name="self_test_camera2">Camera 2</string>
+    <string name="self_test_finger">Fingerprint module</string>
+    <string name="self_test_ethernet">Is the wired network connected</string>
+    <string name="self_test_wifi">Is the wireless network connected</string>
+    <string name="self_test_keyboard">External password keyboard</string>
+    <string name="self_test_tips">Note: The testing covers all modules, and there may be module inconsistencies between different products. Please review the testing results based on the actual product</string>
+    <string name="self_test_confirm">Confirm</string>
+
+    <string name="box_score_thresh">Box Confidence Threshold</string>
+    <string name="box_un_clip_ratio">Box Size Ratio</string>
+    <string name="app_permission">Get Camera Permission</string>
+    <string name="storage_permission">Get Storage Permission</string>
+    <string name="do_angle">Text Orientation Detection</string>
+    <string name="ocr_identify">identify</string>
+    <string name="ocr_clear">clear</string>
+    <string name="ocr_add">add</string>
+    <string name="ocr_delete">delete</string>
+    <string name="ocr_result">result</string>
+    <string name="ocr_result_tips">result</string>
+    <string name="ocr_confirm">confirm</string>
+
+    <string name="select_pic">select pic</string>
+
+    <string name="take_pic">take pic</string>
+
+    <string name="passport_num">Card Num</string>
+    <string name="passport_birthday">Birthday</string>
+    <string name="passport_endtime">End Time</string>
+
+    <string name="camera_0">visible light</string>
+    <string name="camera_1">infrared light</string>
+    <string name="camera_2">OCR</string>
+
+    <string name="memory">Memory Size:</string>
+    <string name="storage">Storage Size:</string>
+    <string name="system">System Version:</string>
+    <string name="tips">Tips</string>
+    <string name="loading">Loading…</string>
+    <string name="excel_content">Do you need to export the results to Excel</string>
+    <string name="file_path">File Path:</string>
+    <string name="stop_test">Do you need to stop the test and restart the App?</string>
 
-  <string name="open_device">打开设备</string>
-  <string name="open_device_suc">打开设备成功</string>
-  <string name="open_device_fail">打开设备失败</string>
-  <string name="already_open_device">设备已经打开</string>
-  <string name="close_device_suc">关闭设备成功</string>
-  <string name="close_device_fail">关闭设备失败</string>
-  <string name="already_close_device">设备已经关闭</string>
+    <string name="test_time">Test time</string>
+    <string name="test_times">Test times</string>
+    <string name="test_camera">Camera module</string>
+    <string name="test_finger">Finger module</string>
+    <string name="test_cz">Cz card module</string>
+    <string name="test_max2">Max2 card module</string>
 
-  <string name="start_read">开启读取</string>
-  <string name="start_read_suc">开启成功</string>
-  <string name="start_read_fail">开启失败</string>
-  <string name="stop_read">停止读取</string>
-  <string name="stop_read_suc">停止成功</string>
-  <string name="stop_read_fail">停止失败</string>
-  <string name="already_start_read">读取已经开始</string>
-  <string name="already_stop_read">读取已经停止</string>
+    <string name="change_languages">languages</string>
+    <string name="open_cn_ocr">Open Chinese OCR</string>
+    <string name="open_aging_test">Open Aging Test</string>
+    <string name="is_sec">This is secondary screen</string>
 
-  <string name="please_open_device">请先打开设备</string>
-  <string name="please_close_device">请先关闭设备</string>
+    <string name="open_device">Open Device</string>
+    <string name="open_device_suc">Open Device Suc</string>
+    <string name="open_device_fail">Open Device Fail</string>
+    <string name="already_open_device">Already Open Device</string>
 
-  <string name="please_stop_read">请先关闭读写</string>
+    <string name="close_device_suc">Close Device Suc</string>
+    <string name="close_device_fail">Close Device Suc</string>
+    <string name="already_close_device">Already Close Device</string>
 
-  <string name="get_version">获取版本号</string>
-  <string name="get_version_suc">获取版本号成功</string>
-  <string name="get_version_fail">获取版本号失败</string>
+    <string name="start_read">Start Read</string>
+    <string name="start_read_suc">Start Read Suc</string>
+    <string name="start_read_fail">Start Read Fail</string>
+    <string name="stop_read">Stop Read</string>
+    <string name="stop_read_suc">Stop Read Suc</string>
+    <string name="stop_read_fail">Stop Read Fail</string>
+    <string name="already_start_read">Already Start Read</string>
+    <string name="already_stop_read">Already Stop Read</string>
 
-  <string name="get_cardtype">获取卡类型</string>
-  <string name="get_cardtype_suc">获取卡类型成功</string>
-  <string name="get_cardtype_fail">获取卡类型失败</string>
-  <string name="query_card_bt">寻卡</string>
-  <string name="query_card_result">寻卡结果</string>
-  <string name="query_card_suc">寻卡成功</string>
-  <string name="query_card_fail">寻卡失败</string>
-  <string name="active">激活</string>
-  <string name="get_text">获取文本</string>
+    <string name="please_open_device">Please Open Device</string>
+    <string name="please_close_device">Please Close Device</string>
+    <string name="please_stop_read">Please Stop Read</string>
 
-  <string name="please_input_num">请输入卡号</string>
-  <string name="please_input_birthday">请输入生日</string>
-  <string name="please_input_endtime">请输入证件过期日期</string>
+    <string name="get_version">Get Version</string>
+    <string name="get_version_suc">Get Version Suc</string>
+    <string name="get_version_fail">Get Version Fail</string>
 
-  <string name="take_photo">循环读卡</string>
-  <string name="single_take">单次读卡</string>
-  <string name="take_photo_blur">拍照</string>
-  <!-- TODO: Remove or change this placeholder text -->
-  <string name="v_ocr">OCR 固件：</string>
-  <string name="v_finger">指纹固件：</string>
-  <string name="v_system">安卓系统固件：</string>
-  <string name="v_camear_v">可见光固件：</string>
-  <string name="v_camear_ir">红外固件：</string>
-  <string name="v_passport">护照固件：</string>
-  <string name="v_ic_card">IC卡固件：</string>
-  <string name="v_restart">获取固件版本后需重启系统</string>
+    <string name="get_cardtype">Get Cardtype</string>
+    <string name="get_cardtype_suc">Get Cardtype Suc</string>
+    <string name="get_cardtype_fail">Get Cardtype Fail</string>
+    <string name="query_card_bt">Query Card</string>
+    <string name="query_card_result">Query Result</string>
+    <string name="query_card_suc">Query Card Suc</string>
+    <string name="query_card_fail">Query Card Fail</string>
 
-  <string name="face_setting">设置</string>
+    <string name="active">Active</string>
+    <string name="get_text">Get Text</string>
 
-  <string name="face_open_camera">打开摄像头</string>
+    <string name="please_input_num">Please Input Num</string>
+    <string name="please_input_birthday">Please Input Birthday</string>
+    <string name="please_input_endtime">Please Input Endtime</string>
 
-  <string name="face_close_camera">关闭摄像头</string>
+    <string name="take_photo">Loop Read</string>
+    <string name="single_take">Single Read</string>
 
-  <string name="face_start_detect">开始活体</string>
+    <string name="v_ocr">OCR FV：</string>
+    <string name="v_finger">Finger FW：</string>
+    <string name="v_system">Android FW：</string>
+    <string name="v_camear_v">Camear_V FW：</string>
+    <string name="v_camear_ir">Camear_IR FW：</string>
+    <string name="v_passport">PassPort FW：</string>
+    <string name="v_ic_card">IC Card FW：</string>
 
-  <string name="face_take_photo">拍照</string>
+    <string name="v_restart">After get version, the system needs to be restarted</string>
 
-  <string name="face_start_aging">老化测试开始</string>
+    <string name="face_setting">Parameter Settings</string>
 
-  <string name="face_stop_aging">老化测试关闭</string>
+    <string name="face_open_camera">Open Camera</string>
 
-  <string name="face_exit">退出</string>
+    <string name="face_close_camera">Close Camera</string>
 
-  <string name="setting_camera_id_1">摄像头1序号</string>
+    <string name="face_start_detect">Start Detect</string>
 
-  <string name="setting_camera_id_2">摄像头2序号</string>
+    <string name="face_take_photo">Take Photo</string>
 
-  <string name="setting_camera_id_3">摄像头3序号</string>
+    <string name="face_start_aging">Aging Test Start</string>
 
-  <string name="setting_yes">是</string>
+    <string name="face_stop_aging">Aging Test Stop</string>
 
-  <string name="setting_open_angle">打开角度检测</string>
+    <string name="face_exit">Back</string>
 
-  <string name="setting_open_auto_focus">是否自动对焦</string>
+    <string name="setting_camera_id_1">camera1 index</string>
 
-  <string name="setting_reverse_frame">画框是否镜像</string>
+    <string name="setting_camera_id_2">camera2 index</string>
 
-  <string name="setting_open_occlusion">打开遮挡检测</string>
+    <string name="setting_camera_id_3">camera3 index</string>
 
-  <string name="setting_open_eye">打开闭眼检测</string>
+    <string name="setting_yes">Yes</string>
 
-  <string name="setting_open_diff">打开偏移检测</string>
+    <string name="setting_open_angle">angle check</string>
 
-  <string name="setting_camera_rotation">预览旋转角度</string>
+    <string name="setting_open_auto_focus">auto focus</string>
 
-  <string name="setting_camera1_rotation">预览1旋转角度</string>
+    <string name="setting_reverse_frame">reverse frame</string>
 
-  <string name="setting_camera2_rotation">预览2旋转角度</string>
+    <string name="setting_open_occlusion">occlus check</string>
 
-  <string name="setting_camera3_rotation">预览3旋转角度</string>
+    <string name="setting_open_eye">eye check</string>
 
-  <string name="setting_camera_mirror">预览是否镜像</string>
+    <string name="setting_open_diff">diff check</string>
 
-  <string name="setting_camera1_mirror">预览1是否镜像</string>
+    <string name="setting_camera_rotation">camera rotation</string>
 
-  <string name="setting_camera2_mirror">预览2是否镜像</string>
+    <string name="setting_camera1_rotation">camera1 rotation</string>
 
-  <string name="setting_camera3_mirror">预览3是否镜像</string>
+    <string name="setting_camera2_rotation">camera2 rotation</string>
 
-  <string name="setting_camera_flip">预览是否翻转</string>
+    <string name="setting_camera3_rotation">camera3 rotation</string>
 
-  <string name="setting_camera1_flip">预览1是否翻转</string>
+    <string name="setting_camera_mirror">camera mirror</string>
 
-  <string name="setting_camera2_flip">预览2是否翻转</string>
+    <string name="setting_camera1_mirror">camera1 mirror</string>
 
-  <string name="setting_camera3_flip">预览3是否翻转</string>
+    <string name="setting_camera2_mirror">camera2 mirror</string>
 
-  <string name="setting_input_rotation">视频旋转角度</string>
+    <string name="setting_camera3_mirror">camera3 mirror</string>
 
-  <string name="setting_input1_rotation">视频1旋转角度</string>
+    <string name="setting_camera_flip">camera flip</string>
 
-  <string name="setting_input2_rotation">视频2旋转角度</string>
+    <string name="setting_camera1_flip">camera1 flip</string>
 
-  <string name="setting_input3_rotation">视频3旋转角度</string>
+    <string name="setting_camera2_flip">camera2 flip</string>
 
-  <string name="setting_input_mirror">视频是否镜像</string>
+    <string name="setting_camera3_flip">camera3 flip</string>
 
-  <string name="setting_input1_mirror">视频1是否镜像</string>
+    <string name="setting_input_rotation">input rotation</string>
 
-  <string name="setting_input2_mirror">视频2是否镜像</string>
+    <string name="setting_input1_rotation">input1 rotation</string>
 
-  <string name="setting_input3_mirror">视频3是否镜像</string>
+    <string name="setting_input2_rotation">input2 rotation</string>
 
-  <string name="setting_input_flip">视频是否翻转</string>
+    <string name="setting_input3_rotation">input3 rotation</string>
 
-  <string name="setting_input1_flip">视频1是否翻转</string>
+    <string name="setting_input_mirror">input mirror</string>
 
-  <string name="setting_input2_flip">视频2是否翻转</string>
+    <string name="setting_input1_mirror">input1 mirror</string>
 
-  <string name="setting_input3_flip">视频3是否翻转</string>
+    <string name="setting_input2_mirror">input2 mirror</string>
 
-  <string name="setting_open_full_camera">打开全景摄像头</string>
+    <string name="setting_input3_mirror">input3 mirror</string>
 
-  <string name="setting_show_ir">是否显示红外</string>
+    <string name="setting_input_flip">input flip</string>
 
-  <string name="setting_have_em">是否有电机</string>
+    <string name="setting_input1_flip">input1 flip</string>
 
-  <string name="setting_location">预览框大小</string>
+    <string name="setting_input2_flip">inputa2 flip</string>
 
-  <string name="setting_face_frame">显示人脸边框</string>
+    <string name="setting_input3_flip">input3 flip</string>
 
-  <string name="setting_dark_light">打开暗光模式</string>
+    <string name="setting_open_full_camera">open full camera</string>
 
-  <string name="setting_save">保存</string>
+    <string name="setting_show_ir">show ir</string>
 
-  <string name="setting_reset">重置</string>
+    <string name="setting_have_em">have em</string>
 
-  <string name="setting_Cancel">取消</string>
+    <string name="setting_location">location</string>
 
-  <string name="setting">设置</string>
+    <string name="setting_face_frame">show face frame</string>
 
-  <string name="image_display_area">图片展示区</string>
+    <string name="setting_dark_light">dark light</string>
 
-  <string name="info_display_area">信息展示区</string>
+    <string name="setting_save">Save</string>
 
-  <string name="document_information">证件信息</string>
+    <string name="setting_reset">Reset</string>
 
-  <string name="total_time">总时间（毫秒）</string>
+    <string name="setting_Cancel">Cancel</string>
 
-  <string name="read_card_time">读卡时间（毫秒）</string>
+    <string name="setting">Setting</string>
 
-  <string name="mrz_area">机读区</string>
+    <string name="image_display_area">Image display Area</string>
 
-  <string name="item">项目</string>
+    <string name="info_display_area">Info display Area</string>
 
-  <string name="content">内容</string>
+    <string name="document_information">Document information</string>
 
-  <string name="ocr_item"></string>
+    <string name="total_time">Total Time(ms)</string>
 
-  <string name="ocr_content">【OCR解析内容】</string>
+    <string name="read_card_time">ReadCard Time(ms)</string>
 
-  <string name="id_no">IdNo</string>
+    <string name="mrz_area">MRZ</string>
 
-  <string name="country">Country</string>
+    <string name="item">Item</string>
 
-  <string name="sex">Sex</string>
+    <string name="content">Content</string>
 
-  <string name="chinese">中文</string>
+    <string name="ocr_item">HIHI</string>
 
-  <string name="english">英文</string>
+    <string name="ocr_content">【OCR Content】</string>
 
-  <string name="no_ocr_result">OCR识别没有结果</string>
-  <string name="out_time">识别超时</string>
-  <string name="no_qr_result">扫码失败</string>
-  <string name="qr_result">扫码成功</string>
-  <string name="mrz_error">MRZ格式错误</string>
+    <string name="id_no">IdNo</string>
 
-  <string name="cut_pic_fail">裁剪图片失败</string>
+    <string name="country">Country</string>
 
-  <string name="init_fail">初始化失败</string>
-  <string name="init_ocr_fail">OCR算法初始失败</string>
-  <string name="read_fw">读取固件</string>
-  <string name="qr_read">扫码</string>
-  <string name="read_stop">停止读取</string>
-  <string name="disconnect">设备已断开</string>
-  <string name="connect">设备已连接</string>
-  <string name="card_type">卡片类型</string>
-  <string name="stop_read_card">停止中...</string>
-  <string-array name="language">
-    <item>英文</item>
-    <item>中文</item>
-  </string-array>
+    <string name="sex">Sex</string>
 
-  <string-array name="uvc_id">
-    <item>0</item>
-    <item>1</item>
-  </string-array>
+    <string name="chinese">Chinese</string>
 
-  <string-array name="id">
-    <item>-1</item>
-    <item>0</item>
-    <item>1</item>
-    <item>2</item>
-    <item>3</item>
-  </string-array>
+    <string name="english">English</string>
 
-  <string-array name="angle">
-    <item>0</item>
-    <item>90</item>
-    <item>180</item>
-    <item>270</item>
-  </string-array>
-  <string-array name="yesOrno">
-    <item>是</item>
-    <item>否</item>
-  </string-array>
+    <string name="no_ocr_result">NO OCR Result</string>
 
-  <string-array name="location">
-    <item>"0|0|640|480"</item>
-    <item>"0|0|320|240"</item>
-  </string-array>
+    <string name="out_time">Out Time</string>
+
+    <string name="no_qr_result">Scan failed</string>
+    <string name="qr_result">Scan success</string>
+    <string name="mrz_error">MRZ format error</string>
+    <string name="cut_pic_fail">Cut Pic fail</string>
+    <string name="init_fail">Init fail</string>
+
+    <string name="init_ocr_fail">OCR init failed</string>
+
+    <string name="read_fw">Read FW</string>
+    <string name="qr_read">Scan QR</string>
+    <string name="read_stop">Stop Read</string>
+
+    <string name="disconnect">Device disconnect</string>
+
+    <string name="connect">Device connect</string>
+
+    <string name="card_type">Card Type</string>
+    <string name="stop_read_card">stopping…</string>
+    <string-array name="yesOrno">
+        <item>Yes</item>
+        <item>No</item>
+    </string-array>
+    <string-array name="language">
+        <item>English</item>
+        <item>Chinese</item>
+    </string-array>
+
+    <string-array name="uvc_id">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="id">
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="angle">
+        <item>0</item>
+        <item>90</item>
+        <item>180</item>
+        <item>270</item>
+    </string-array>
+
+    <string-array name="location">
+        <item>"0|0|640|480"</item>
+        <item>"0|0|320|240"</item>
+    </string-array>
+
+    <string-array name="angle_em">
+        <item>20</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+
+    <string name="open_camera">Open Camera</string>
+    <string name="open_camera_v">Open Camera V</string>
+    <string name="close_camera">Close Camera</string>
+    <string name="liveness_detection">Liveness Detect</string>
+    <string name="sm_close">Encryption Close</string>
+    <string name="electrical">Electrical</string>
+    <string name="sm_open">Encryption Open</string>
+    <string name="take_pic_single">Take Single Pic</string>
+    <string name="scan">scan</string>
+    <string name="aging_test">Aging Test</string>
+    <string name="audio_test">Audio Test</string>
+
+    <string name="liveness">liveness</string>
+    <string name="warn1">Clicking too fast</string>
+    <string name="setting_em_rotation">EM Rotaion</string>
+    <string name="setting_em_angle">Rotation Angle </string>
+
+    <string name="open_camera_success"> times open camera success</string>
+
+    <string name="open_camera_fail"> times open camera fail</string>
+
+    <string name="close_camera_success"> times close camera success</string>
+
+    <string name="close_camera_fail"> times close camera fail</string>
+
+    <string name="plug_in_camera">Please plug camera</string>
+
+    <string name="version">version：</string>
+
+    <string name="face_camera">Please face the camera…</string>
+
+
+    <string name="close_aging_test">Stop Aging</string>
+
+    <string name="change_language">Do you want to switch the language? The change will take effect after restarting the application.</string>
+
+    <string name="setting_open_led">open Led</string>
+
+    <string name="setting_uvc_camera_no">uvc camera no</string>
+
+    <string name="setting_cancel">Cancel</string>
+    <string name="timeout">Timeout</string>
+    <string name="scan_taking">Scan taking: </string>
+    <string name="scan_failed_taking">Scan failed taking: </string>
 </resources>

@@ -1,0 +1,45 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingDefaultResource">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="800dp"
+        android:orientation="vertical"
+        android:padding="16dp">
+        <!-- Customize this layout to your needs -->
+
+        <Button
+            android:id="@+id/reset_bt"
+            style="@style/setting_button"
+            android:text="复位" />
+
+        <Button
+            android:id="@+id/find_bt"
+            style="@style/setting_button"
+            android:text="自动巡航" />
+
+        <Button
+            android:id="@+id/up_bt"
+            style="@style/setting_button"
+            android:text="上移" />
+
+        <Button
+            android:id="@+id/down_bt"
+            style="@style/setting_button"
+            android:text="下移" />
+
+        <Button
+            android:id="@+id/interrupt_bt"
+            style="@style/setting_button"
+            android:text="中断" />
+
+
+
+    </LinearLayout>
+</layout>

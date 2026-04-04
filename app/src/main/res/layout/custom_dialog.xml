@@ -1,0 +1,467 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingDefaultResource">
+
+    <data>
+
+    </data>
+
+
+    <!--    <ScrollView-->
+    <!--        android:foregroundGravity="center"-->
+    <!--        android:layout_gravity="center"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:fillViewport="true">-->
+
+    <!--        <HorizontalScrollView-->
+    <!--            android:layout_gravity="center"-->
+    <!--            android:foregroundGravity="center"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:fillViewport="true">-->
+
+    <LinearLayout
+        android:layout_width="600dp"
+        android:layout_height="500dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:padding="16dp">
+        <!-- Customize this layout to your needs -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/setting"
+            android:textSize="25dp" />
+
+        <LinearLayout
+            android:id="@+id/uvc_camera_id_ll"
+            style="@style/setting_ll"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_uvc_camera_no" />
+
+            <Spinner
+                android:id="@+id/uvc_camera_id_sp"
+                style="@style/setting_sp"
+                android:entries="@array/uvc_id" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_open_led" />
+
+            <Spinner
+                android:id="@+id/open_led_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/camera_id_ll"
+            style="@style/setting_ll"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_camera_id_1" />
+
+            <Spinner
+                android:id="@+id/camera1_id_sp"
+                style="@style/setting_sp"
+                android:entries="@array/id" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_camera_id_2" />
+
+            <Spinner
+                android:id="@+id/camera2_id_sp"
+                style="@style/setting_sp"
+                android:entries="@array/id" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_camera_id_3" />
+
+            <Spinner
+                android:id="@+id/camera3_id_sp"
+                style="@style/setting_sp"
+                android:entries="@array/id" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/setting_ll">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_open_angle" />
+
+            <Spinner
+                android:id="@+id/open_angle_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_open_auto_focus" />
+
+            <Spinner
+                android:id="@+id/open_auto_focus_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_reverse_frame" />
+
+            <Spinner
+                android:id="@+id/reverse_frame_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/setting_ll">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_open_occlusion" />
+
+            <Spinner
+                android:id="@+id/open_occlusion_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_open_eye" />
+
+            <Spinner
+                android:id="@+id/open_eye_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_open_diff" />
+
+            <Spinner
+                android:id="@+id/open_diff_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/setting_ll"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_camera1_rotation" />
+
+            <Spinner
+                android:id="@+id/camera1_rotation_sp"
+                style="@style/setting_sp"
+                android:entries="@array/angle" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:entries="@array/yesOrno"
+                android:text="@string/setting_camera1_mirror" />
+
+            <Spinner
+                android:id="@+id/camera1_mirror_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_camera1_flip" />
+
+            <Spinner
+                android:id="@+id/camera1_flip_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+        </LinearLayout>
+
+
+        <LinearLayout style="@style/setting_ll">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_camera2_rotation" />
+
+            <Spinner
+                android:id="@+id/camera2_rotation_sp"
+                style="@style/setting_sp"
+                android:entries="@array/angle" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:entries="@array/yesOrno"
+                android:text="@string/setting_camera2_mirror" />
+
+            <Spinner
+                android:id="@+id/camera2_mirror_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_camera2_flip" />
+
+            <Spinner
+                android:id="@+id/camera2_flip_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/setting_ll">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_camera3_rotation" />
+
+            <Spinner
+                android:id="@+id/camera3_rotation_sp"
+                style="@style/setting_sp"
+                android:entries="@array/angle" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:entries="@array/yesOrno"
+                android:text="@string/setting_camera3_mirror" />
+
+            <Spinner
+                android:id="@+id/camera3_mirror_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_camera3_flip" />
+
+            <Spinner
+                android:id="@+id/camera3_flip_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/setting_ll"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_input1_rotation" />
+
+            <Spinner
+                android:id="@+id/camera1_check_sp"
+                style="@style/setting_sp"
+                android:entries="@array/angle" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:entries="@array/yesOrno"
+                android:text="@string/setting_input1_mirror" />
+
+            <Spinner
+                android:id="@+id/input1_mirror_bt"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_input1_flip" />
+
+            <Spinner
+                android:id="@+id/input1_flip_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/setting_ll">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_input2_rotation" />
+
+            <Spinner
+                android:id="@+id/camera2_check_sp"
+                style="@style/setting_sp"
+                android:entries="@array/angle" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:entries="@array/yesOrno"
+                android:text="@string/setting_input2_mirror" />
+
+            <Spinner
+                android:id="@+id/input2_mirror_bt"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_input2_flip" />
+
+            <Spinner
+                android:id="@+id/input2_flip_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/setting_ll">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_input3_rotation" />
+
+            <Spinner
+                android:id="@+id/camera3_check_sp"
+                style="@style/setting_sp"
+                android:entries="@array/angle" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:entries="@array/yesOrno"
+                android:text="@string/setting_input3_mirror" />
+
+            <Spinner
+                android:id="@+id/input3_mirror_bt"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_input3_flip" />
+
+            <Spinner
+                android:id="@+id/input3_flip_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/setting_ll"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_open_full_camera" />
+
+            <Spinner
+                android:id="@+id/open_full_camera_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_show_ir" />
+
+            <Spinner
+                android:id="@+id/show_ir_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+
+            <TextView
+                style="@style/setting_tv"
+                android:entries="@array/yesOrno"
+                android:text="@string/setting_have_em" />
+
+            <Spinner
+                android:id="@+id/have_em_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/setting_ll">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_location" />
+
+            <Spinner
+                android:id="@+id/location_sp"
+                style="@style/setting_sp"
+                android:entries="@array/location" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_face_frame" />
+
+            <Spinner
+                android:id="@+id/face_frame_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_dark_light" />
+
+            <Spinner
+                android:id="@+id/dark_light_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/setting_ll"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_em_rotation" />
+
+            <Spinner
+                android:id="@+id/rotation_sp"
+                style="@style/setting_sp"
+                android:entries="@array/yesOrno" />
+
+            <TextView
+                style="@style/setting_tv"
+                android:text="@string/setting_em_angle" />
+
+            <Spinner
+                android:id="@+id/angle_sp"
+                style="@style/setting_sp"
+                android:entries="@array/angle_em" />
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            style="@style/setting_ll"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp">
+
+            <Button
+                android:id="@+id/save_config_bt"
+                style="@style/setting_button"
+                android:text="@string/setting_save" />
+
+            <Button
+                android:id="@+id/reset_config_bt"
+                style="@style/setting_button"
+                android:text="@string/setting_reset" />
+
+            <Button
+                android:id="@+id/cancel_bt"
+                style="@style/setting_button"
+                android:text="@string/setting_cancel" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <!--        </HorizontalScrollView>-->
+    <!--    </ScrollView>-->
+
+
+</layout>

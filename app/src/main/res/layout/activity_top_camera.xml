@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/camera_view_ll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+
+        <TextView
+            android:id="@+id/change_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:text="@string/change"
+            android:textColor="@color/black"
+            android:textSize="30dp"></TextView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/setting_bt"
+                style="@style/button"
+                android:text="@string/setting"></Button>
+
+            <Button
+                android:id="@+id/em_test_bt"
+                style="@style/button"
+                android:text="@string/electrical"></Button>
+
+            <Button
+                android:id="@+id/open_bt"
+                style="@style/button"
+                android:text="@string/open_camera"></Button>
+
+            <Button
+                android:id="@+id/start_bt"
+                style="@style/button"
+                android:text="@string/liveness_detection"></Button>
+
+            <Button
+                android:id="@+id/get_pic_bt"
+                style="@style/button"
+                android:text="@string/take_pic"></Button>
+
+            <Button
+                android:id="@+id/open_v_bt"
+                style="@style/button"
+                android:text="@string/open_camera_v"
+                android:visibility="gone"></Button>
+
+            <Button
+                android:id="@+id/get_pic_single_bt"
+                style="@style/button"
+                android:text="@string/take_pic_single"
+                android:visibility="gone"></Button>
+
+            <Button
+                android:id="@+id/scan_bt"
+                style="@style/button"
+                android:text="@string/scan"
+                android:visibility="gone"></Button>
+
+            <Button
+                android:id="@+id/close_bt"
+                style="@style/button"
+                android:text="@string/close_camera"></Button>
+
+            <Button
+                android:id="@+id/aging_test_bt"
+                style="@style/button"
+                android:text="@string/aging_test"
+                android:visibility="gone"></Button>
+
+
+            <Button
+                android:id="@+id/stop_bt"
+                style="@style/button"
+                android:text="@string/close_camera"
+                android:visibility="gone"></Button>
+
+            <Button
+                style="@style/button"
+                android:onClick="exit"
+                android:text="@string/exit"></Button>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/times_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="70dp"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="25dp"></TextView>
+
+
+        <LinearLayout
+            android:id="@+id/layout_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/face1_iv"
+                android:layout_width="150dp"
+                android:layout_height="180dp"
+                android:layout_marginLeft="10dp"></ImageView>
+
+            <ImageView
+                android:id="@+id/face2_iv"
+                android:layout_width="150dp"
+                android:layout_height="180dp"></ImageView>
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/version_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="240dp"
+            android:textColor="@color/black"
+            android:textSize="25dp"></TextView>
+
+        <RelativeLayout
+            android:id="@+id/camera_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"></RelativeLayout>
+
+        <TextView
+            android:id="@+id/tip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="220dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="50dp"
+            android:layout_toLeftOf="@+id/layout_image"
+            android:textColor="@color/black"
+            android:textSize="20dp"></TextView>
+
+    </RelativeLayout>
+
+</layout>

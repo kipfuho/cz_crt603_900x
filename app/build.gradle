@@ -26,6 +26,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "int", "ocrType", ocrType
+        buildConfigField "boolean", "UVC", isUVC
 
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a'
@@ -80,10 +81,22 @@ dependencies {
 
     api(name: "lib_sdk_v1.0.85_202601270924", ext: 'aar') { transitive = true }
     api(name: "lib_usbcamera-release", ext: 'aar') { transitive = true }
-    api(name: "lib_new_face_release_v1.0.85_202601270923", ext: 'aar') { transitive = true }
     api(name: "lib_crtreader900x-release", ext: 'aar') { transitive = true }
     api(name: "lib_ocr_zs2_v1.0.85_202601271411", ext: 'aar') { transitive = true }
     api(name: "lib_grglog_v2.0_202601220901", ext: 'aar') { transitive = true }
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.10"  //扫码需要
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"//扫码需要
+
+    if (isUVC.toBoolean()) {
+        api(name: "lib_camera_uvc_v3.0.55_202602100942", ext: 'aar') { transitive = true }
+        api(name: "libuvccamera_v3.0.55_202602100947", ext: 'aar') { transitive = true }
+        api(name: "libusbcommon_v4.1.1", ext: 'aar') { transitive = true }
+    } else {
+        api(name: "lib_camera2_release_v3.0.55_202604011109", ext: 'aar') { transitive = true }
+    }
+    api(name: "lib_new_face_release_v3.0.55_202604011109", ext: 'aar') { transitive = true }
+    api(name: "usbSerialForAndroid_v2.0_202512160959", ext: 'aar') { transitive = true }
 
     api(rootProject.ext.dependencies.fastjson)
 }
