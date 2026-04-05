@@ -263,6 +263,7 @@ public class SimKioskActivity extends Activity {
   }
 
   private void log(String s) {
+    Log.i(TAG, s);
     Message msg = Message.obtain(mHandler);
     msg.obj = s + "\n";
     mHandler.sendMessage(msg);
