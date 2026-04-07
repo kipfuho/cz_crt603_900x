@@ -26,28 +26,58 @@ import java.util.List;
 /**
  * SimKioskActivity — CRT-591M SIM dispenser controller.
  * <p>
- * ── Command reference ──────────────────────────────────────────────────────── All commands: [ADDR
- * 1B][CMD 2B][SUB 2B][DATA...] Response byte[0] == 0x50 → success
+ * ── Protocol response format (CRT-591-MRXX V1.4, §1.2) ──────────────────────
  * <p>
- * Card transport [addr]433030   Reset + eject to exit gate (card fully released) [addr]433031 Reset
- * + recycle (move card to recycle bin) [addr]433033   Reset, card stays in place [addr]433230 Move
- * to card-hold position (partially out, still retractable) [addr]433231   Move to IC-contact
- * position [addr]433232   Move to RF position [addr]433233   Move to recycle bin [addr]433239 Move
- * to no-card-hold (fully retract) [addr]433240   Wait / signal for user pickup at exit gate
- * [addr]433330   Enable card entry from exit gate [addr]433331   Disable card entry from exit gate
+ * The driver strips the serial framing (STX/ADDR/LEN/ETX/BCC) and returns only the TXET payload in
+ * out[]:
  * <p>
- * Status / query [addr]433130   Query device status  → byte[6] = status flags [addr]433131   Query
- * sensors        → byte[6] = sensor bitmap bit0 = card at IC position bit1 = card at entry gate
- * bit2 = card at exit gate bit3 = card in transport path bit4 = stock LOW  (few SIMs remaining)
- * bit5 = stock MED  (medium stock) bit6 = stock HIGH (plenty of SIMs) [addr]43A230   Read device
- * serial number [addr]43A330   Read device config [addr]43A430   Read firmware version
+ * SUCCESS  → out[0]='P'(50H)  out[1]=CM  out[2]=PM  out[3]=st0  out[4]=st1 out[5]=st2
+ * out[6..N]=DATA ERROR    → out[0]='N'(4EH)  out[1]=CM  out[2]=PM  out[3]=e1   out[4]=e0
  * <p>
- * IC / SAM card [addr]435130[VCC]     Cold-reset   VCC: 30=5V  33=3V [addr]435138 Warm-reset
- * [addr]435131          Deactivate (power off contacts) [addr]4351[T][APDU]   Send APDU T: 33=T=0
- * 34=T=1
+ * All fields are ASCII characters.
  * <p>
- * SIM stock level (from sensor byte[6] bits 4-6) LOW  : bit4 set, bits 5-6 clear MED  : bit5 set
- * HIGH : bit6 set (only one bit will be set at a time; if none set → unknown / empty)
+ * Status codes (st0, st1, st2) — §2.1.2: st0: '0'=no card in machine  '1'=card at gate  '2'=card at
+ * IC/RF position st1: '0'=no card in stacker  '1'=few cards     '2'=enough cards st2: '0'=bin not
+ * full        '1'=bin full
+ * <p>
+ * Error codes (e1,e0) — §2.2: "A0" = empty stack (no card in stacker) "A1" = error card bin full
+ * "10" = card jam "16" = card position movement error "43" = cannot move card to IC position "65" =
+ * card not activated etc.
+ * <p>
+ * Sensor data (§3.1.2, PM=31H response): out[6..13] = S1..S8, each ASCII: '0'=no card  '1'=card
+ * present S1=gate area  S2=IC/RF area  S3-S7=transport path sensors  S8=reserved
+ * <p>
+ * Card move commands (§3.1.3): CM=32H PM=30H  → card-hold position (gate, retractable) CM=32H
+ * PM=31H  → IC card position (from stacker) CM=32H PM=32H  → RF card position CM=32H PM=33H  →
+ * recycle bin CM=32H PM=39H  → move card out of gate (full eject) CM=32H PM=61H  → read-write area
+ * → gate (card-hold) CM=32H PM=62H  → read-write area → IC position (stacker only) CM=32H PM=64H  →
+ * read-write area → gate (no card-hold, full eject) CM=32H PM=72H  → dispensing motor backward
+ * (retract from stacker exit)
+ * <p>
+ * Reset/Init commands (§3.1.1): CM=30H PM=30H  → reset, move card to gate CM=30H PM=31H  → reset,
+ * capture card to recycle bin CM=30H PM=33H  → reset, do not move card CM=30H PM=34H  → same as 30H
+ * + retract counter CM=30H PM=35H  → same as 31H + retract counter CM=30H PM=37H  → same as 33H +
+ * retract counter Response DATA = firmware version string (e.g. "CRT-591-M001")
+ * <p>
+ * CPU card commands (§3.3): CM=51H PM=30H Vcc → cold reset  Vcc: 30H=5V EMV  33H=5V ISO  35H=3V ISO
+ * CM=51H PM=31H     → power off / deactivate CM=51H PM=32H     → status check  DATA=sti CM=51H
+ * PM=33H APDU→ T=0 APDU exchange CM=51H PM=34H APDU→ T=1 APDU exchange CM=51H PM=38H     → warm
+ * reset CM=51H PM=39H APDU→ auto T=0/T=1 APDU exchange Cold-reset positive response DATA: Type(1) +
+ * ATR(N) Type: '0'=T=0  '1'=T=1
+ * <p>
+ * Card entry (§3.1.5): CM=33H PM=30H → enable card entry from gate CM=33H PM=31H → disable card
+ * entry from gate
+ * <p>
+ * Auto IC type check (§3.2.1): CM=50H PM=30H → returns Card_type (2 bytes ASCII)
+ * <p>
+ * Firmware version (§3.7): CM=DCH PM=31H → returns version string
+ * <p>
+ * Serial number (§3.6.8): CM=A2H PM=30H → returns len(1) + SN(N)
+ * <p>
+ * Machine config (§3.6.9): CM=A3H PM=30H → returns config bytes
+ * <p>
+ * Recycle bin counter (§3.6.10): CM=A5H PM=30H → read counter (3 ASCII digits "000"-"999") CM=A5H
+ * PM=31H Count(3) → set counter initial value
  */
 public class SimKioskActivity extends Activity {
 
@@ -61,36 +91,43 @@ public class SimKioskActivity extends Activity {
   private String addr = "00";
   private String portName = "/dev/ttyS5";
   private int baud = 115200;
-  private int cardType = 0;       // 0=T=0, 1=T=1
-  private boolean cardInIcPos = false;
+  private int cardType = 0;       // 0=T=0, 1=T=1 (set after cold-reset)
+  private boolean cardInIcPos = false;   // true after successful cold-reset
   private boolean connected = false;
 
   // ── UI — TextViews ────────────────────────────────────────────────────
   private TextView tvLog;
   private TextView tvIccid;
   private TextView tvStatus;
-  private TextView tvStockLevel;   // replaces tvSlotCount
+  private TextView tvStockLevel;
   private TextView tvConnInfo;
 
   // ── UI — Buttons ──────────────────────────────────────────────────────
   private Button btnConnect;
   private Button btnDisconnect;
 
-  // Stock / transport
+  // Dispenser / transport
   private Button btnCheckStock;
-  private Button btnDispense;          // dispense one SIM to hold position
-  private Button btnPushToGate;        // present at exit gate (retractable)
-  private Button btnEjectFull;         // full eject — user takes card
-  private Button btnRetract;           // retract back to no-hold
-  private Button btnRecycle;           // send to recycle bin
-  private Button btnEnableEntry;       // allow card entry from gate
-  private Button btnDisableEntry;      // block card entry from gate
+  private Button btnDispense;
+  private Button btnPushToGate;
+  private Button btnEjectFull;
+  private Button btnRetract;
+  private Button btnRecycle;
+  private Button btnMotorBackward;
+  private Button btnEnableEntry;
+  private Button btnDisableEntry;
 
   // IC / SIM chip
   private Button btnReadIccid;
+  private Button btnAutoDetectType;
   private Button btnColdReset;
   private Button btnWarmReset;
   private Button btnDeactivate;
+
+  // Reset / init
+  private Button btnResetEject;
+  private Button btnResetRecycle;
+  private Button btnResetStay;
 
   // Device queries
   private Button btnQueryStatus;
@@ -98,6 +135,7 @@ public class SimKioskActivity extends Activity {
   private Button btnSerialNumber;
   private Button btnDeviceConfig;
   private Button btnFirmware;
+  private Button btnRecycleBinCount;
 
   // Misc
   private Button btnClearLog;
@@ -119,7 +157,6 @@ public class SimKioskActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_sim_kiosk);
 
-    // Grant tty permissions
     try {
       Process process = Runtime.getRuntime().exec("su");
       DataOutputStream os = new DataOutputStream(process.getOutputStream());
@@ -134,16 +171,15 @@ public class SimKioskActivity extends Activity {
     }
 
     crt = new Crtdriver();
-    Log.e(TAG, crt.getVersion());
+    Log.i(TAG, "SDK version: " + crt.getVersion());
 
     bindViews();
     setupHandler();
     setupListeners();
     setConnected(false);
 
-    log("SimKiosk ready.");
-    log("Port=" + portName + "  Baud=" + baud + "  Addr=" + addr);
-    log("Press CONNECT to open the serial port.");
+    log("SimKiosk ready. Port=" + portName + " Baud=" + baud + " Addr=" + addr);
+    log("Press CONNECT to open port.");
   }
 
   @Override
@@ -174,19 +210,26 @@ public class SimKioskActivity extends Activity {
     btnEjectFull = findViewById(R.id.btnEjectFull);
     btnRetract = findViewById(R.id.btnRetract);
     btnRecycle = findViewById(R.id.btnRecycle);
+    btnMotorBackward = findViewById(R.id.btnMotorBackward);
     btnEnableEntry = findViewById(R.id.btnEnableEntry);
     btnDisableEntry = findViewById(R.id.btnDisableEntry);
 
     btnReadIccid = findViewById(R.id.btnReadIccid);
+    btnAutoDetectType = findViewById(R.id.btnAutoDetectType);
     btnColdReset = findViewById(R.id.btnSimColdReset);
     btnWarmReset = findViewById(R.id.btnSimWarmReset);
     btnDeactivate = findViewById(R.id.btnSimDeactivate);
+
+    btnResetEject = findViewById(R.id.btnResetEject);
+    btnResetRecycle = findViewById(R.id.btnResetRecycle);
+    btnResetStay = findViewById(R.id.btnResetStay);
 
     btnQueryStatus = findViewById(R.id.btnSimQueryStatus);
     btnQuerySensors = findViewById(R.id.btnSimQuerySensors);
     btnSerialNumber = findViewById(R.id.btnSimSerialNumber);
     btnDeviceConfig = findViewById(R.id.btnSimDeviceConfig);
     btnFirmware = findViewById(R.id.btnSimFirmware);
+    btnRecycleBinCount = findViewById(R.id.btnRecycleBinCount);
 
     btnClearLog = findViewById(R.id.btnSimClearLog);
 
@@ -194,12 +237,11 @@ public class SimKioskActivity extends Activity {
     spinnerBaud = findViewById(R.id.spinnerSimBaud);
     spinnerAddr = findViewById(R.id.spinnerSimAddr);
 
-    // ── Populate spinners ─────────────────────────────────────────────
     String[] ports = getSerialPortNames();
     spinnerPort.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_item, ports));
-    String intentPort = portName.replace("/dev/", "");
+    String curPort = portName.replace("/dev/", "");
     for (int i = 0; i < ports.length; i++) {
-      if (ports[i].equals(intentPort)) {
+      if (ports[i].equals(curPort)) {
         spinnerPort.setSelection(i);
         break;
       }
@@ -207,9 +249,9 @@ public class SimKioskActivity extends Activity {
 
     String[] bauds = {"9600", "19200", "38400", "57600", "115200"};
     spinnerBaud.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_item, bauds));
-    String intentBaud = String.valueOf(baud);
+    String curBaud = String.valueOf(baud);
     for (int i = 0; i < bauds.length; i++) {
-      if (bauds[i].equals(intentBaud)) {
+      if (bauds[i].equals(curBaud)) {
         spinnerBaud.setSelection(i);
         break;
       }
@@ -270,7 +312,7 @@ public class SimKioskActivity extends Activity {
   }
 
   // ─────────────────────────────────────────────────────────────────────
-  //  Listeners
+  //  Listeners + connection state
   // ─────────────────────────────────────────────────────────────────────
 
   private void setupListeners() {
@@ -283,19 +325,26 @@ public class SimKioskActivity extends Activity {
     btnEjectFull.setOnClickListener(v -> runInThread(this::doEjectFull));
     btnRetract.setOnClickListener(v -> runInThread(this::doRetract));
     btnRecycle.setOnClickListener(v -> runInThread(this::doRecycle));
+    btnMotorBackward.setOnClickListener(v -> runInThread(this::doMotorBackward));
     btnEnableEntry.setOnClickListener(v -> runInThread(this::doEnableEntry));
     btnDisableEntry.setOnClickListener(v -> runInThread(this::doDisableEntry));
 
     btnReadIccid.setOnClickListener(v -> runInThread(this::doReadIccid));
+    btnAutoDetectType.setOnClickListener(v -> runInThread(this::doAutoDetectType));
     btnColdReset.setOnClickListener(v -> runInThread(this::doColdReset));
     btnWarmReset.setOnClickListener(v -> runInThread(this::doWarmReset));
     btnDeactivate.setOnClickListener(v -> runInThread(this::doDeactivate));
+
+    btnResetEject.setOnClickListener(v -> runInThread(() -> doReset("30")));
+    btnResetRecycle.setOnClickListener(v -> runInThread(() -> doReset("31")));
+    btnResetStay.setOnClickListener(v -> runInThread(() -> doReset("33")));
 
     btnQueryStatus.setOnClickListener(v -> runInThread(this::doQueryStatus));
     btnQuerySensors.setOnClickListener(v -> runInThread(this::doQuerySensors));
     btnSerialNumber.setOnClickListener(v -> runInThread(this::doSerialNumber));
     btnDeviceConfig.setOnClickListener(v -> runInThread(this::doDeviceConfig));
     btnFirmware.setOnClickListener(v -> runInThread(this::doFirmwareVersion));
+    btnRecycleBinCount.setOnClickListener(v -> runInThread(this::doRecycleBinCount));
 
     btnClearLog.setOnClickListener(v -> runOnUiThread(() -> tvLog.setText("")));
   }
@@ -304,41 +353,44 @@ public class SimKioskActivity extends Activity {
     new Thread(r).start();
   }
 
-  private void setConnected(boolean isConnected) {
-    connected = isConnected;
+  private void setConnected(boolean on) {
+    connected = on;
     runOnUiThread(() -> {
-      spinnerPort.setEnabled(!isConnected);
-      spinnerBaud.setEnabled(!isConnected);
-      spinnerAddr.setEnabled(!isConnected);
+      spinnerPort.setEnabled(!on);
+      spinnerBaud.setEnabled(!on);
+      spinnerAddr.setEnabled(!on);
+      btnConnect.setEnabled(!on);
+      btnDisconnect.setEnabled(on);
 
-      btnConnect.setEnabled(!isConnected);
-      btnDisconnect.setEnabled(isConnected);
+      btnCheckStock.setEnabled(on);
+      btnDispense.setEnabled(on);
+      btnPushToGate.setEnabled(on);
+      btnEjectFull.setEnabled(on);
+      btnRetract.setEnabled(on);
+      btnRecycle.setEnabled(on);
+      btnMotorBackward.setEnabled(on);
+      btnEnableEntry.setEnabled(on);
+      btnDisableEntry.setEnabled(on);
 
-      btnCheckStock.setEnabled(isConnected);
-      btnDispense.setEnabled(isConnected);
-      btnPushToGate.setEnabled(isConnected);
-      btnEjectFull.setEnabled(isConnected);
-      btnRetract.setEnabled(isConnected);
-      btnRecycle.setEnabled(isConnected);
-      btnEnableEntry.setEnabled(isConnected);
-      btnDisableEntry.setEnabled(isConnected);
+      btnReadIccid.setEnabled(on);
+      btnAutoDetectType.setEnabled(on);
+      btnColdReset.setEnabled(on);
+      btnWarmReset.setEnabled(on);
+      btnDeactivate.setEnabled(on);
 
-      btnReadIccid.setEnabled(isConnected);
-      btnColdReset.setEnabled(isConnected);
-      btnWarmReset.setEnabled(isConnected);
-      btnDeactivate.setEnabled(isConnected);
+      btnResetEject.setEnabled(on);
+      btnResetRecycle.setEnabled(on);
+      btnResetStay.setEnabled(on);
 
-      btnQueryStatus.setEnabled(isConnected);
-      btnQuerySensors.setEnabled(isConnected);
-      btnSerialNumber.setEnabled(isConnected);
-      btnDeviceConfig.setEnabled(isConnected);
-      btnFirmware.setEnabled(isConnected);
+      btnQueryStatus.setEnabled(on);
+      btnQuerySensors.setEnabled(on);
+      btnSerialNumber.setEnabled(on);
+      btnDeviceConfig.setEnabled(on);
+      btnFirmware.setEnabled(on);
+      btnRecycleBinCount.setEnabled(on);
 
-      if (tvConnInfo != null) {
-        tvConnInfo.setText(
-            isConnected ? portName + " @ " + baud + "  [" + addr + "]" : "Not connected");
-        tvConnInfo.setTextColor(isConnected ? 0xFF8EC97A : 0xFFCF6679);
-      }
+      tvConnInfo.setText(on ? portName + " @ " + baud + "  [" + addr + "]" : "Not connected");
+      tvConnInfo.setTextColor(on ? 0xFF8EC97A : 0xFFCF6679);
     });
   }
 
@@ -351,7 +403,7 @@ public class SimKioskActivity extends Activity {
     baud = Integer.parseInt(spinnerBaud.getSelectedItem().toString());
     addr = spinnerAddr.getSelectedItem().toString();
 
-    log("── Connect (" + portName + " @ " + baud + "  addr=" + addr + ") ──");
+    log("── Connect " + portName + " @ " + baud + " addr=" + addr);
     crt.Select_Dev(9);
     int fd = crt.R_Open(portName, baud);
     if (fd > 0) {
@@ -361,19 +413,18 @@ public class SimKioskActivity extends Activity {
       runOnUiThread(() -> tvStatus.setText("Connected"));
       toast("Connected on " + portName);
     } else {
-      log("R_Open FAILED  ret=" + fd);
+      log("R_Open FAILED ret=" + fd);
       toast("Connect failed (ret=" + fd + ")");
     }
   }
 
   private void doDisconnect() {
-    log("── Disconnect ──────────────────────────────────");
+    log("── Disconnect");
     if (cardInIcPos) {
-      execCmd(addr + "435131");   // deactivate contacts first
+      execCmd(addr + "4351" + "31");   // CPU card power off
       cardInIcPos = false;
     }
-    int ret = crt.R_Close(n_Fd);
-    log("R_Close ret=" + ret);
+    crt.R_Close(n_Fd);
     n_Fd = 0;
     setConnected(false);
     runOnUiThread(() -> {
@@ -385,242 +436,334 @@ public class SimKioskActivity extends Activity {
   }
 
   // ─────────────────────────────────────────────────────────────────────
-  //  Stock management
+  //  Reset / Initialization  (§3.1.1)
+  //
+  //  CM=30H  PM=30H  move card to gate
+  //  CM=30H  PM=31H  capture card to recycle bin
+  //  CM=30H  PM=33H  do not move card
+  //  Response DATA = firmware version string
   // ─────────────────────────────────────────────────────────────────────
 
-  /**
-   * Check SIM stock level via sensor bitmap.
-   * <p>
-   * Sensor byte[6] stock bits: bit4 = LOW  (almost empty — refill soon) bit5 = MED  (medium stock)
-   * bit6 = HIGH (well stocked) Only one bit should be set at a time. If none set → dispenser empty
-   * or sensor fault.
-   */
+  private void doReset(String pm) {
+    String label = pm.equals("30") ? "EJECT" : pm.equals("31") ? "RECYCLE" : "STAY";
+    log("── Reset (" + label + ")");
+    CommandResult cr = execCmd(addr + "43" + "30" + pm);
+    if (cr.ok && cr.dataLen > 0) {
+      String fw = asciiData(cr, 0, cr.dataLen);
+      log("FW version: " + fw);
+      runOnUiThread(() -> tvStatus.setText("Reset OK  FW=" + fw));
+    } else {
+      logError("Reset", cr);
+    }
+    // Reset clears cardInIcPos state
+    cardInIcPos = false;
+    runOnUiThread(() -> tvIccid.setText("—"));
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  //  Stock check  (§3.1.2  PM=30H)
+  //
+  //  st1 in out[4]:
+  //    '0' = no card in stacker
+  //    '1' = few cards
+  //    '2' = enough cards
+  // ─────────────────────────────────────────────────────────────────────
+
   private void doCheckStock() {
-    log("── Check Stock Level ───────────────────────────");
-    CommandResult cr = execCmd(addr + "433131");
+    log("── Check Stock");
+    CommandResult cr = execCmd(addr + "43" + "31" + "30");
     if (!cr.ok) {
-      log("Sensor query failed.");
+      logError("CheckStock", cr);
       runOnUiThread(() -> tvStockLevel.setText("ERROR"));
       return;
     }
 
-    int sensors = cr.outLen > 6 ? (cr.out[6] & 0xFF) : 0;
-    log(String.format("Sensor byte=0x%02X", sensors));
+    char st0 = cr.st0;  // card in machine: '0'=none '1'=at gate '2'=at IC/RF
+    char st1 = cr.st1;  // stock: '0'=empty '1'=few '2'=enough
+    char st2 = cr.st2;  // bin: '0'=not full '1'=full
 
-    // Card position flags (bits 0-3)
-    boolean cardAtIc = (sensors & 0x01) != 0;
-    boolean cardAtEntry = (sensors & 0x02) != 0;
-    boolean cardAtExit = (sensors & 0x04) != 0;
-    boolean cardInPath = (sensors & 0x08) != 0;
-
-    // Stock level flags (bits 4-6)
-    boolean stockLow = (sensors & 0x10) != 0;
-    boolean stockMed = (sensors & 0x20) != 0;
-    boolean stockHigh = (sensors & 0x40) != 0;
-
-    String level;
-    int levelColor;
-    if (stockHigh) {
-      level = "HIGH";
-      levelColor = 0xFF8EC97A;  // green
-    } else if (stockMed) {
-      level = "MED";
-      levelColor = 0xFFF0A500;  // amber
-    } else if (stockLow) {
-      level = "LOW";
-      levelColor = 0xFFCF6679;  // red
-    } else {
-      level = "EMPTY";
-      levelColor = 0xFFCF6679;
+    String stock;
+    int stockColor;
+    switch (st1) {
+      case '2':
+        stock = "HIGH";
+        stockColor = 0xFF8EC97A;
+        break;
+      case '1':
+        stock = "LOW";
+        stockColor = 0xFFCF6679;
+        break;
+      default:
+        stock = "EMPTY";
+        stockColor = 0xFFCF6679;
+        break;
     }
 
-    log("Stock level: " + level);
-    log("Card pos — IC:" + cardAtIc + "  Entry:" + cardAtEntry + "  Exit:" + cardAtExit + "  Path:"
-        + cardInPath);
+    String cardPos;
+    switch (st0) {
+      case '1':
+        cardPos = "at gate";
+        break;
+      case '2':
+        cardPos = "at IC/RF";
+        break;
+      default:
+        cardPos = "none";
+        break;
+    }
 
-    int finalColor = levelColor;
-    String finalLevel = level;
+    boolean binFull = (st2 == '1');
+
+    log(String.format("st0='%c' st1='%c' st2='%c'  stock=%s  cardPos=%s  binFull=%b", st0, st1, st2,
+        stock, cardPos, binFull));
+
+    String finalStock = stock;
+    int finalColor = stockColor;
     runOnUiThread(() -> {
-      tvStockLevel.setText(finalLevel);
+      tvStockLevel.setText(finalStock);
       tvStockLevel.setTextColor(finalColor);
+      tvStatus.setText("Card: " + cardPos + "  Bin full: " + binFull);
     });
   }
 
-  /**
-   * Dispense one SIM: move from stacker to card-hold position. Card is held by the transport —
-   * still retractable at this point. Call doPushToGate() or doEjectFull() after this to present to
-   * user.
-   */
-  private void doDispense() {
-    log("── Dispense SIM ────────────────────────────────");
+  // ─────────────────────────────────────────────────────────────────────
+  //  Sensor query  (§3.1.2  PM=31H)
+  //
+  //  Response DATA = S1..S8 (8 bytes ASCII, out[6..13])
+  //    '0' = no card   '1' = card present
+  // ─────────────────────────────────────────────────────────────────────
 
-    // Step 1 — move to card-hold (partially out, retractable)
-    CommandResult cr = execCmd(addr + "433230");
-    log("Move to hold: " + (cr.ok ? "OK" : "FAIL"));
+  private void doQuerySensors() {
+    log("── Query Sensors");
+    CommandResult cr = execCmd(addr + "43" + "31" + "31");
     if (!cr.ok) {
-      toast("Dispense failed");
+      logError("Sensors", cr);
       return;
     }
 
-    log("SIM dispensed to hold position. Ready to push or retract.");
+    StringBuilder sb = new StringBuilder();
+    sb.append(String.format("st0='%c' st1='%c' st2='%c'\n", cr.st0, cr.st1, cr.st2));
+    for (int i = 0; i < cr.dataLen && i < 8; i++) {
+      char val = (char) (cr.out[6 + i] & 0xFF);
+      sb.append(String.format("  S%d = '%c' (%s)\n", i + 1, val, val == '1' ? "CARD" : "empty"));
+    }
+    log(sb.toString());
+    runOnUiThread(() -> tvStatus.setText(sb.toString().trim()));
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  //  Status query  (§3.1.2  PM=30H)
+  // ─────────────────────────────────────────────────────────────────────
+
+  private void doQueryStatus() {
+    log("── Query Status");
+    CommandResult cr = execCmd(addr + "43" + "31" + "30");
+    if (!cr.ok) {
+      logError("Status", cr);
+      return;
+    }
+
+    String cardPos = st0Desc(cr.st0);
+    String stock = st1Desc(cr.st1);
+    String bin = (cr.st2 == '1') ? "BIN FULL" : "bin ok";
+
+    String s = String.format("Card: %s  Stock: %s  %s", cardPos, stock, bin);
+    log(s);
+    runOnUiThread(() -> tvStatus.setText(s));
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  //  Card transport  (§3.1.3)
+  // ─────────────────────────────────────────────────────────────────────
+
+  /**
+   * Dispense one SIM: move from stacker to card-hold (gate) position. CM=32H PM=30H — card-hold
+   * position. Card partially out, still retractable.
+   */
+  private void doDispense() {
+    log("── Dispense → card-hold position");
+    CommandResult cr = execCmd(addr + "43" + "32" + "30");
+    if (!cr.ok) {
+      logError("Dispense", cr);
+      toast("Dispense failed");
+      return;
+    }
+    logStatus("Dispense OK", cr);
     runOnUiThread(() -> tvStatus.setText("SIM at hold — push or retract"));
     toast("SIM dispensed to hold position");
   }
 
   /**
-   * Push SIM to exit gate — card is presented but transport still holds the tail. Can still be
-   * retracted with doRetract().
+   * Push card to gate but keep hold (retractable). Same as doDispense but with the pickup-wait
+   * signal. CM=32H PM=30H = card-hold at gate.
    */
   private void doPushToGate() {
-    log("── Push SIM to gate (retractable) ──────────────");
-
-    // Move to card-hold at gate (not full eject)
-    CommandResult cr = execCmd(addr + "433230");
-    log("Push to gate: " + (cr.ok ? "OK" : "FAIL"));
+    log("── Push to gate (retractable)");
+    CommandResult cr = execCmd(addr + "43" + "32" + "30");
     if (!cr.ok) {
+      logError("PushToGate", cr);
       toast("Push failed");
       return;
     }
-
-    // Signal device: waiting for user to take card
-    cr = execCmd(addr + "433240");
-    log("Wait-for-pickup signal: " + (cr.ok ? "OK" : "FAIL (non-fatal)"));
-
+    logStatus("Push OK", cr);
     runOnUiThread(() -> tvStatus.setText("SIM at gate — retractable"));
-    toast("SIM presented at gate. Can still retract.");
+    toast("SIM at gate. Can still retract.");
   }
 
   /**
-   * Full eject — drives card completely out past the gate into user's hand. Card CANNOT be
-   * retracted after this.
+   * Full eject — move card out of gate completely. CM=32H PM=39H — moves card out of gate. Card is
+   * released, cannot retract.
    */
   private void doEjectFull() {
-    log("── Full Eject (card released) ───────────────────");
-
-    CommandResult cr = execCmd(addr + "433030");  // reset + full eject
-    log("Full eject: " + (cr.ok ? "OK" : "FAIL"));
+    log("── Full eject (PM=39H)");
+    CommandResult cr = execCmd(addr + "43" + "32" + "39");
     if (!cr.ok) {
+      logError("FullEject", cr);
       toast("Eject failed");
       return;
     }
-
+    logStatus("Eject OK", cr);
     cardInIcPos = false;
     runOnUiThread(() -> {
       tvStatus.setText("Card ejected — taken by user");
       tvIccid.setText("—");
     });
-    toast("Card fully ejected. Cannot retract.");
+    toast("Card fully ejected.");
   }
 
   /**
-   * Retract the card from gate / hold back to no-hold position inside the machine.
+   * Retract card back to recycle bin. CM=32H PM=33H — move card to error card bin.
    */
   private void doRetract() {
-    log("── Retract SIM ─────────────────────────────────");
-
+    log("── Retract to recycle bin (PM=33H)");
     if (cardInIcPos) {
-      CommandResult deact = execCmd(addr + "435131");
-      log("Deactivate contacts: " + (deact.ok ? "OK" : "FAIL (ignored)"));
+      execCmd(addr + "43" + "51" + "31");  // CPU card power off first
       cardInIcPos = false;
     }
-
-    // Move to no-card-hold (fully retract)
-    CommandResult cr = execCmd(addr + "433239");
-    log("Retract to no-hold: " + (cr.ok ? "OK" : "FAIL"));
-
-    toast(cr.ok ? "SIM retracted" : "Retract failed");
-    runOnUiThread(() -> tvStatus.setText(cr.ok ? "SIM retracted" : "Retract failed"));
+    CommandResult cr = execCmd(addr + "43" + "32" + "33");
+    if (!cr.ok) {
+      logError("Retract", cr);
+      toast("Retract failed");
+      return;
+    }
+    logStatus("Retract OK", cr);
+    runOnUiThread(() -> tvStatus.setText("SIM retracted to bin"));
+    toast("SIM retracted");
   }
 
   /**
-   * Send the card to the recycle bin.
+   * Recycle via reset command. CM=30H PM=31H — reset + capture card to recycle bin.
    */
   private void doRecycle() {
-    log("── Recycle SIM ─────────────────────────────────");
-
+    log("── Recycle (reset+capture PM=31H)");
     if (cardInIcPos) {
-      execCmd(addr + "435131");
+      execCmd(addr + "43" + "51" + "31");
       cardInIcPos = false;
     }
-
-    // reset + recycle
-    CommandResult cr = execCmd(addr + "433031");
-    log("Recycle: " + (cr.ok ? "OK" : "FAIL"));
-
-    toast(cr.ok ? "SIM sent to recycle bin" : "Recycle failed");
+    CommandResult cr = execCmd(addr + "43" + "30" + "31");
+    if (!cr.ok) {
+      logError("Recycle", cr);
+      toast("Recycle failed");
+      return;
+    }
+    if (cr.dataLen > 0) {
+      log("FW: " + asciiData(cr, 0, cr.dataLen));
+    }
+    logStatus("Recycle OK", cr);
     runOnUiThread(() -> {
-      tvStatus.setText(cr.ok ? "SIM recycled" : "Recycle failed");
+      tvStatus.setText("SIM recycled");
       tvIccid.setText("—");
     });
+    toast("SIM recycled");
   }
 
   /**
-   * Enable card entry from exit gate (user can insert a card).
+   * Dispensing motor backward — pulls card at stacker exit back into stacker. CM=32H PM=72H — motor
+   * backward 200ms default. Useful to prevent cards obstructing stacker removal.
+   */
+  private void doMotorBackward() {
+    log("── Motor backward (PM=72H)");
+    CommandResult cr = execCmd(addr + "43" + "32" + "72");
+    if (!cr.ok) {
+      logError("MotorBackward", cr);
+      return;
+    }
+    logStatus("Motor backward OK", cr);
+  }
+
+  /**
+   * Enable card entry from gate (user can insert card). CM=33H PM=30H
    */
   private void doEnableEntry() {
-    log("── Enable Card Entry ───────────────────────────");
-    CommandResult cr = execCmd(addr + "433330");
-    log("Enable entry: " + (cr.ok ? "OK" : "FAIL"));
-    runOnUiThread(() -> tvStatus.setText(cr.ok ? "Entry enabled" : "Enable entry failed"));
-    toast(cr.ok ? "Card entry enabled" : "Failed");
+    log("── Enable card entry");
+    CommandResult cr = execCmd(addr + "43" + "33" + "30");
+    if (!cr.ok) {
+      logError("EnableEntry", cr);
+      return;
+    }
+    logStatus("Entry enabled", cr);
+    runOnUiThread(() -> tvStatus.setText("Card entry ENABLED"));
+    toast("Card entry enabled");
   }
 
   /**
-   * Disable card entry from exit gate.
+   * Disable card entry from gate. CM=33H PM=31H
    */
   private void doDisableEntry() {
-    log("── Disable Card Entry ──────────────────────────");
-    CommandResult cr = execCmd(addr + "433331");
-    log("Disable entry: " + (cr.ok ? "OK" : "FAIL"));
-    runOnUiThread(() -> tvStatus.setText(cr.ok ? "Entry disabled" : "Disable entry failed"));
-    toast(cr.ok ? "Card entry disabled" : "Failed");
+    log("── Disable card entry");
+    CommandResult cr = execCmd(addr + "43" + "33" + "31");
+    if (!cr.ok) {
+      logError("DisableEntry", cr);
+      return;
+    }
+    logStatus("Entry disabled", cr);
+    runOnUiThread(() -> tvStatus.setText("Card entry DISABLED"));
+    toast("Card entry disabled");
   }
 
   // ─────────────────────────────────────────────────────────────────────
-  //  IC / SIM chip operations
+  //  IC / SIM chip  (§3.3)
   // ─────────────────────────────────────────────────────────────────────
 
   /**
-   * Read ICCID: activate card → SELECT EF_ICCID → READ BINARY.
+   * Activate card (cold-reset at 3V ISO) then read ICCID via APDU.
    */
   private void doReadIccid() {
-    log("── Read ICCID ──────────────────────────────────");
-
+    log("── Read ICCID");
     if (!activateCard()) {
       toast("Cannot activate card");
       return;
     }
 
-    // SELECT EF_ICCID (MF level: 2FE2)
-    log("SELECT EF_ICCID...");
-    String selectCmd = buildApdu("00A4000002" + "2FE2");
-    CommandResult cr = execCmd(addr + selectCmd);
+    // SELECT EF_ICCID at MF level (2FE2)
+    log("SELECT EF_ICCID (2FE2)...");
+    CommandResult cr = sendApdu("00A4000002" + "2FE2");
     log("SELECT: " + (cr.ok ? "OK" : "FAIL") + "  SW=" + getSW(cr));
 
     if (!cr.ok) {
-      // Retry via full MF path: 3F00 → 2FE2
-      log("Retry via MF path...");
-      execCmd(addr + buildApdu("00A4000002" + "3F00"));
-      cr = execCmd(addr + selectCmd);
-      log("SELECT (retry): " + (cr.ok ? "OK" : "FAIL") + "  SW=" + getSW(cr));
+      // Retry via explicit MF path 3F00 → 2FE2
+      log("Retry via MF 3F00...");
+      sendApdu("00A4000002" + "3F00");
+      cr = sendApdu("00A4000002" + "2FE2");
+      log("SELECT retry: " + (cr.ok ? "OK" : "FAIL") + "  SW=" + getSW(cr));
       if (!cr.ok) {
         toast("SELECT EF_ICCID failed");
         return;
       }
     }
 
-    // READ BINARY — 10 bytes
-    log("READ BINARY (10 bytes)...");
-    String readCmd = buildApdu("00B000000A");
-    cr = execCmd(addr + readCmd);
+    // READ BINARY — 10 bytes = 20 BCD digits = ICCID
+    log("READ BINARY 10 bytes...");
+    cr = sendApdu("00B000000A");
     log("READ: " + (cr.ok ? "OK" : "FAIL") + "  SW=" + getSW(cr));
     if (!cr.ok) {
       toast("READ BINARY failed");
       return;
     }
 
-    if (cr.outLen < 16) {
-      log("Response too short: " + cr.outLen);
+    // DATA starts at out[6], 10 BCD bytes
+    if (cr.dataLen < 10) {
+      log("Response data too short: " + cr.dataLen);
       toast("Unexpected response length");
       return;
     }
@@ -628,7 +771,7 @@ public class SimKioskActivity extends Activity {
     byte[] bcd = Arrays.copyOfRange(cr.out, 6, 16);
     String iccid = bcdToIccid(bcd);
     log("Raw BCD: " + Utils.bytes2HexStr(bcd, bcd.length, true));
-    log("ICCID:   " + iccid);
+    log("ICCID: " + iccid);
 
     runOnUiThread(() -> {
       tvIccid.setText(iccid);
@@ -638,49 +781,82 @@ public class SimKioskActivity extends Activity {
   }
 
   /**
-   * Cold-reset at 3V and log the ATR.
+   * Auto-detect IC card type.  CM=50H PM=30H  (§3.2.1) Moves card to IC position, detects type,
+   * returns Card_type (2 ASCII bytes).
+   */
+  private void doAutoDetectType() {
+    log("── Auto-detect IC card type (CM=50H PM=30H)");
+    CommandResult cr = execCmd(addr + "43" + "50" + "30");
+    if (!cr.ok) {
+      logError("AutoDetect", cr);
+      return;
+    }
+
+    logStatus("AutoDetect", cr);
+
+    if (cr.dataLen >= 2) {
+      char t1 = (char) (cr.out[6] & 0xFF);
+      char t2 = (char) (cr.out[7] & 0xFF);
+      String typeName = icCardTypeName(t1, t2);
+      log("Card type: " + t1 + t2 + " → " + typeName);
+      runOnUiThread(() -> tvStatus.setText("Card type: " + typeName));
+      toast("Card type: " + typeName);
+    }
+  }
+
+  /**
+   * Cold-reset at 3V ISO.  (§3.3.1)
    */
   private void doColdReset() {
-    log("── Cold Reset (3V) ─────────────────────────────");
+    log("── Cold Reset (3V ISO)");
     activateCard();
   }
 
   /**
-   * Warm-reset — re-initialise card without powering contacts off. Card must already be active
-   * (cold-reset done first).
+   * Warm-reset — re-init card without powering off contacts.  (§3.3.6) CM=51H PM=38H
    */
   private void doWarmReset() {
-    log("── Warm Reset ──────────────────────────────────");
+    log("── Warm Reset (CM=51H PM=38H)");
     if (!cardInIcPos) {
-      log("Card not active — running cold reset first.");
+      log("Card not active — cold-resetting first");
       if (!activateCard()) {
         toast("Cannot activate card");
         return;
       }
     }
-    CommandResult cr = execCmd(addr + "435138");
-    log("Warm reset: " + (cr.ok ? "OK" : "FAIL"));
-    if (cr.ok && cr.outLen > 6) {
-      cardType = (cr.out[6] == 0x30) ? 0 : 1;
-      byte[] atr = Arrays.copyOfRange(cr.out, 7, cr.outLen);
-      log("T=" + cardType + "  ATR=" + Utils.bytes2HexStr(atr, atr.length, true).toUpperCase());
-      runOnUiThread(() -> tvStatus.setText("Warm reset OK, T=" + cardType));
+    CommandResult cr = execCmd(addr + "43" + "51" + "38");
+    if (!cr.ok) {
+      logError("WarmReset", cr);
+      toast("Warm reset failed");
+      return;
     }
-    toast(cr.ok ? "Warm reset OK" : "Warm reset failed");
+
+    logStatus("Warm reset OK", cr);
+    if (cr.dataLen >= 1) {
+      char typeChar = (char) (cr.out[6] & 0xFF);
+      cardType = (typeChar == '0') ? 0 : 1;
+      byte[] atr = Arrays.copyOfRange(cr.out, 7, 6 + cr.dataLen);
+      log("T=" + cardType + "  ATR=" + Utils.bytes2HexStr(atr, atr.length, true).toUpperCase());
+      runOnUiThread(() -> tvStatus.setText("Warm reset OK  T=" + cardType));
+    }
+    toast("Warm reset OK");
   }
 
   /**
-   * Deactivate (power off) card contacts.
+   * Deactivate / power off card contacts.  (§3.3.2) CM=51H PM=31H
    */
   private void doDeactivate() {
-    log("── Deactivate ──────────────────────────────────");
-    CommandResult cr = execCmd(addr + "435131");
-    log("Deactivate: " + (cr.ok ? "OK" : "FAIL"));
-    if (cr.ok) {
-      cardInIcPos = false;
-      runOnUiThread(() -> tvStatus.setText("Contacts deactivated"));
+    log("── Deactivate (CM=51H PM=31H)");
+    CommandResult cr = execCmd(addr + "43" + "51" + "31");
+    if (!cr.ok) {
+      logError("Deactivate", cr);
+      toast("Deactivate failed");
+      return;
     }
-    toast(cr.ok ? "Contacts deactivated" : "Deactivate failed");
+    logStatus("Deactivate OK", cr);
+    cardInIcPos = false;
+    runOnUiThread(() -> tvStatus.setText("Card contacts deactivated"));
+    toast("Contacts deactivated");
   }
 
   // ─────────────────────────────────────────────────────────────────────
@@ -688,97 +864,69 @@ public class SimKioskActivity extends Activity {
   // ─────────────────────────────────────────────────────────────────────
 
   /**
-   * Query device status byte. bit7 = card at IC position bit6 = card at entry gate bit5 = card jam
-   * bit4 = recycle box full bit0 = device ready
+   * Read firmware version.  CM=DCH PM=31H  (§3.7)
    */
-  private void doQueryStatus() {
-    log("── Query Status ────────────────────────────────");
-    CommandResult cr = execCmd(addr + "433130");
+  private void doFirmwareVersion() {
+    log("── Firmware Version (CM=DCH PM=31H)");
+    CommandResult cr = execCmd(addr + "43" + "DC" + "31");
     if (!cr.ok) {
-      log("Query failed.");
+      logError("Firmware", cr);
       return;
     }
-
-    int s = cr.outLen > 6 ? (cr.out[6] & 0xFF) : 0;
-    String str = String.format(
-        "Status=0x%02X  Ready:%b  CardAtIC:%b  CardAtEntry:%b  Jam:%b  BoxFull:%b", s,
-        (s & 0x01) != 0, (s & 0x80) != 0, (s & 0x40) != 0, (s & 0x20) != 0, (s & 0x10) != 0);
-    log(str);
-    runOnUiThread(() -> tvStatus.setText(str));
+    String ver = asciiData(cr, 0, cr.dataLen);
+    log("Firmware: " + ver);
+    runOnUiThread(() -> tvStatus.setText("FW: " + ver));
   }
 
   /**
-   * Query sensor bitmap and log all flags including stock level.
-   */
-  private void doQuerySensors() {
-    log("── Query Sensors ───────────────────────────────");
-    CommandResult cr = execCmd(addr + "433131");
-    if (!cr.ok) {
-      log("Sensor query failed.");
-      return;
-    }
-
-    if (cr.outLen > 6) {
-      int s = cr.out[6] & 0xFF;
-      String str = String.format(
-          "Sensors=0x%02X  IC:%b  Entry:%b  Exit:%b  Path:%b  Low:%b  Med:%b  High:%b", s,
-          (s & 0x01) != 0, (s & 0x02) != 0, (s & 0x04) != 0, (s & 0x08) != 0, (s & 0x10) != 0,
-          (s & 0x20) != 0, (s & 0x40) != 0);
-      log(str);
-      runOnUiThread(() -> tvStatus.setText(str));
-    }
-  }
-
-  /**
-   * Read device serial number.
+   * Read serial number.  CM=A2H PM=30H  (§3.6.8) Response DATA: len(1 byte) + SN(N bytes)
    */
   private void doSerialNumber() {
-    log("── Serial Number ───────────────────────────────");
-    CommandResult cr = execCmd(addr + "43A230");
+    log("── Serial Number (CM=A2H PM=30H)");
+    CommandResult cr = execCmd(addr + "43" + "A2" + "30");
     if (!cr.ok) {
-      log("Query failed.");
+      logError("SerialNumber", cr);
       return;
     }
-    if (cr.outLen > 6) {
-      String sn = new String(Arrays.copyOfRange(cr.out, 6, cr.outLen)).trim();
+    if (cr.dataLen > 1) {
+      // out[6] = length, out[7..] = SN as ASCII
+      int snLen = cr.out[6] & 0xFF;
+      String sn = asciiData(cr, 1, Math.min(snLen, cr.dataLen - 1));
       log("Serial: " + sn);
       runOnUiThread(() -> tvStatus.setText("SN: " + sn));
     }
   }
 
   /**
-   * Read device configuration info.
+   * Read machine configuration.  CM=A3H PM=30H  (§3.6.9)
    */
   private void doDeviceConfig() {
-    log("── Device Config ───────────────────────────────");
-    CommandResult cr = execCmd(addr + "43A330");
+    log("── Device Config (CM=A3H PM=30H)");
+    CommandResult cr = execCmd(addr + "43" + "A3" + "30");
     if (!cr.ok) {
-      log("Query failed.");
+      logError("Config", cr);
       return;
     }
-    if (cr.outLen > 6) {
-      byte[] cfg = Arrays.copyOfRange(cr.out, 6, cr.outLen);
-      String hex = Utils.bytes2HexStr(cfg, cfg.length, true).toUpperCase();
-      log("Config: " + hex);
-      runOnUiThread(() -> tvStatus.setText("Config: " + hex));
-    }
+    String hex = Utils.bytes2HexStr(Arrays.copyOfRange(cr.out, 6, 6 + cr.dataLen), cr.dataLen, true)
+        .toUpperCase();
+    log("Config: " + hex);
+    runOnUiThread(() -> tvStatus.setText("Config: " + hex));
   }
 
   /**
-   * Read firmware version string.
+   * Read recycle bin counter.  CM=A5H PM=30H  (§3.6.10.1) Response DATA: count as 3 ASCII digits
+   * "000"-"999"
    */
-  private void doFirmwareVersion() {
-    log("── Firmware Version ────────────────────────────");
-    CommandResult cr = execCmd(addr + "43A430");
+  private void doRecycleBinCount() {
+    log("── Recycle Bin Counter (CM=A5H PM=30H)");
+    CommandResult cr = execCmd(addr + "43" + "A5" + "30");
     if (!cr.ok) {
-      log("Query failed.");
+      logError("BinCounter", cr);
       return;
     }
-    if (cr.outLen > 6) {
-      String ver = new String(Arrays.copyOfRange(cr.out, 6, cr.outLen)).trim();
-      log("Firmware: " + ver);
-      runOnUiThread(() -> tvStatus.setText("FW: " + ver));
-    }
+    String count = asciiData(cr, 0, Math.min(3, cr.dataLen));
+    log("Recycle bin count: " + count);
+    runOnUiThread(() -> tvStatus.setText("Recycle bin count: " + count));
   }
 
   // ─────────────────────────────────────────────────────────────────────
@@ -786,59 +934,115 @@ public class SimKioskActivity extends Activity {
   // ─────────────────────────────────────────────────────────────────────
 
   /**
-   * Move card to IC position (skipping if already there) then cold-reset at 3V.
+   * Move card to IC position (skipping if sensor shows already there), then cold-reset at 3V ISO.
+   * (§3.3.1  CM=51H PM=30H Vcc=35H)
+   * <p>
+   * Uses sensor query (§3.1.2 PM=31H) to check card presence and position: st0 = '2' → card already
+   * at IC/RF position st0 = '1' → card at gate, need to move st0 = '0' + st1 = '0' → no card at all
+   * → abort
    *
-   * @return true if cold-reset succeeded and ATR received.
+   * @return true if cold-reset succeeded and ATR received
    */
   private boolean activateCard() {
-    // Check current position via sensor query
-    log("Checking card position...");
-    CommandResult status = execCmd(addr + "433131");
-    boolean alreadyAtIc = status.ok && status.outLen > 6
-        && (status.out[6] & 0x01) != 0;   // bit0 = card at IC position
+    log("Checking card position via sensor query...");
+    CommandResult status = execCmd(addr + "43" + "31" + "30");  // PM=30H status request
+
+    if (!status.ok) {
+      log("Status query failed — cannot check card position.");
+      return false;
+    }
+
+    log(String.format("st0='%c' st1='%c' st2='%c'", status.st0, status.st1, status.st2));
+
+    // st0='0' and st1='0' → no card anywhere
+    if (status.st0 == '0' && status.st1 == '0') {
+      log("No card in machine (st0='0' st1='0').");
+      runOnUiThread(() -> tvStatus.setText("No card in dispenser"));
+      toast("No card present");
+      return false;
+    }
+
+    // st0='2' → card already at IC/RF position — skip move
+    boolean alreadyAtIc = (status.st0 == '2');
 
     if (!alreadyAtIc) {
-      log("Moving to IC position...");
-      CommandResult cr = execCmd(addr + "433231");
-      log("Move to IC: " + (cr.ok ? "OK" : "FAIL"));
-      if (!cr.ok) {
+      log("Moving card to IC position (CM=32H PM=31H)...");
+      CommandResult move = execCmd(addr + "43" + "32" + "31");
+      log("Move to IC: " + (move.ok ? "OK" : "FAIL e=" + getError(move)));
+      if (!move.ok) {
         return false;
       }
     } else {
-      log("Card already at IC position, skipping move.");
+      log("Card already at IC/RF position — skipping move.");
     }
 
-    // Cold-reset at 3V
-    log("Cold reset at 3V...");
-    CommandResult cr = execCmd(addr + "435130" + "33");
-    log("Cold reset: " + (cr.ok ? "OK" : "FAIL"));
+    // Cold-reset at 3V ISO  (Vcc=35H)
+    log("Cold reset 3V ISO (CM=51H PM=30H Vcc=35H)...");
+    CommandResult cr = execCmd(addr + "43" + "51" + "30" + "35");
+    log("Cold reset: " + (cr.ok ? "OK" : "FAIL e=" + getError(cr)));
 
-    if (cr.ok && cr.outLen > 6) {
-      cardType = (cr.out[6] == 0x30) ? 0 : 1;
-      byte[] atr = Arrays.copyOfRange(cr.out, 7, cr.outLen);
+    if (cr.ok && cr.dataLen >= 1) {
+      // out[6] = Type: '0'=T=0  '1'=T=1
+      char typeChar = (char) (cr.out[6] & 0xFF);
+      cardType = (typeChar == '0') ? 0 : 1;
+      byte[] atr = Arrays.copyOfRange(cr.out, 7, 6 + cr.dataLen);
       log("T=" + cardType + "  ATR=" + Utils.bytes2HexStr(atr, atr.length, true).toUpperCase());
       cardInIcPos = true;
-      runOnUiThread(() -> tvStatus.setText("Card active, T=" + cardType));
+      runOnUiThread(() -> tvStatus.setText("Card active  T=" + cardType));
     }
 
     return cr.ok;
   }
 
   /**
-   * Build APDU command string: 4351 [T type] [apdu hex]
+   * Send a C-APDU to the currently active card using auto T=0/T=1. CM=51H PM=39H — auto protocol
+   * selection.  (§3.3.7)
    */
-  private String buildApdu(String apduHex) {
-    return "4351" + (cardType == 0 ? "33" : "34") + apduHex;
+  private CommandResult sendApdu(String apduHex) {
+    // PM=39H = auto T=0/T=1 protocol selection
+    return execCmd(addr + "43" + "51" + "39" + apduHex);
   }
 
   /**
-   * Extract SW1SW2 string from last 2 bytes of response.
+   * Build APDU command with explicit protocol type. CM=51H PM=33H = T=0,  CM=51H PM=34H = T=1
+   */
+  private CommandResult sendApduTyped(String apduHex) {
+    String pm = (cardType == 0) ? "33" : "34";
+    return execCmd(addr + "43" + "51" + pm + apduHex);
+  }
+
+  /**
+   * Extract SW1SW2 from APDU response data (last 2 bytes of DATA field). DATA starts at out[6],
+   * length = cr.dataLen.
    */
   private String getSW(CommandResult cr) {
-    if (cr.outLen < 2) {
+    if (cr.dataLen < 2) {
       return "????";
     }
-    return String.format("%02X%02X", cr.out[cr.outLen - 2] & 0xFF, cr.out[cr.outLen - 1] & 0xFF);
+    int swOffset = 6 + cr.dataLen - 2;
+    return String.format("%02X%02X", cr.out[swOffset] & 0xFF, cr.out[swOffset + 1] & 0xFF);
+  }
+
+  /**
+   * Read N ASCII bytes from DATA field starting at dataOffset.
+   */
+  private String asciiData(CommandResult cr, int dataOffset, int len) {
+    int start = 6 + dataOffset;
+    int end = Math.min(start + len, 6 + cr.dataLen);
+    if (start >= end) {
+      return "";
+    }
+    return new String(Arrays.copyOfRange(cr.out, start, end)).trim();
+  }
+
+  /**
+   * Get error string from a failed response.
+   */
+  private String getError(CommandResult cr) {
+    if (cr.outLen >= 5 && cr.out[0] == 0x4E) {
+      return "" + (char) (cr.out[3] & 0xFF) + (char) (cr.out[4] & 0xFF);
+    }
+    return "rc=" + cr.rc;
   }
 
   /**
@@ -859,6 +1063,59 @@ public class SimKioskActivity extends Activity {
     return sb.toString();
   }
 
+  /**
+   * IC card type name from 2-char type code (§3.2.1).
+   */
+  private String icCardTypeName(char t1, char t2) {
+    if (t1 == '0' && t2 == '0') {
+      return "Unknown";
+    }
+    if (t1 == '1') {
+      return t2 == '0' ? "CPU T=0" : "CPU T=1";
+    }
+    if (t1 == '2') {
+      return t2 == '0' ? "SLE4442" : "SLE4428";
+    }
+    if (t1 == '3') {
+      int n = t2 - '0';
+      String[] i2c = {"AT24C01", "AT24C02", "AT24C04", "AT24C08", "AT24C16", "AT24C32", "AT24C64",
+          "AT24C128", "AT24C256"};
+      return (n >= 0 && n < i2c.length) ? i2c[n] : "I2C unknown";
+    }
+    return "Unknown(" + t1 + t2 + ")";
+  }
+
+  private String st0Desc(char st0) {
+    switch (st0) {
+      case '1':
+        return "card at gate";
+      case '2':
+        return "card at IC/RF";
+      default:
+        return "no card";
+    }
+  }
+
+  private String st1Desc(char st1) {
+    switch (st1) {
+      case '2':
+        return "enough cards";
+      case '1':
+        return "few cards";
+      default:
+        return "empty";
+    }
+  }
+
+  private void logStatus(String label, CommandResult cr) {
+    log(String.format("%s  st0='%c'(%s)  st1='%c'(%s)  st2='%c'", label, cr.st0, st0Desc(cr.st0),
+        cr.st1, st1Desc(cr.st1), cr.st2));
+  }
+
+  private void logError(String label, CommandResult cr) {
+    log(label + " FAILED  e=" + getError(cr) + "  rc=" + cr.rc);
+  }
+
   // ─────────────────────────────────────────────────────────────────────
   //  Command executor
   // ─────────────────────────────────────────────────────────────────────
@@ -869,11 +1126,28 @@ public class SimKioskActivity extends Activity {
     byte[] out;
     int outLen;
     int rc;
+    // Parsed from response
+    char st0 = '0';
+    char st1 = '0';
+    char st2 = '0';
+    int dataLen = 0;  // bytes of DATA after st2 (i.e. outLen - 6)
   }
 
+  /**
+   * Execute a hex command string and parse the response.
+   * <p>
+   * Command string format: [ADDR(2)][CMT='C'(2)][CM(2)][PM(2)][DATA...] Note: CMT byte '43H' is
+   * always 'C' and is already included in the command strings we build (e.g. addr + "43" + "31" +
+   * "30").
+   * <p>
+   * Response layout (driver strips framing): [0]  = 'P'(50H) success  or 'N'(4EH) error [1]  = CM
+   * echo (ASCII) [2]  = PM echo (ASCII) [3]  = st0 or e1 (ASCII) [4]  = st1 or e0 (ASCII) [5]  =
+   * st2 (success only, ASCII) [6+] = DATA (success only)
+   */
   private CommandResult execCmd(String commandStr) {
     CommandResult result = new CommandResult();
     result.out = new byte[3072];
+
     log("→ " + commandStr.replaceAll("(.{2})", "$1 ").toUpperCase());
 
     byte[] inBuf = Utils.hexStr2ByteArrs(commandStr);
@@ -883,14 +1157,32 @@ public class SimKioskActivity extends Activity {
     try {
       result.rc = crt.R_ExeCommandS(n_Fd, commandStr, length, result.out, outLenArr);
     } catch (Exception e) {
-      log("R_ExeCommandS threw, falling back to R_ExeCommandB");
+      log("R_ExeCommandS threw — fallback to R_ExeCommandB");
       result.rc = crt.R_ExeCommandB(n_Fd, inBuf, length, result.out, outLenArr);
     }
 
     result.outLen = outLenArr[0] * 256 + outLenArr[1];
-    result.ok = (result.rc == 0) && (result.outLen > 0) && (result.out[0] == 0x50);
+    result.ok =
+        (result.rc == 0) && (result.outLen >= 3) && (result.out[0] == 0x50);   // 'P' = success
+
+    // Parse status fields from success response
+    if (result.ok && result.outLen >= 6) {
+      result.st0 = (char) (result.out[3] & 0xFF);
+      result.st1 = (char) (result.out[4] & 0xFF);
+      result.st2 = (char) (result.out[5] & 0xFF);
+      result.dataLen = result.outLen - 6;
+    }
+
     log("← " + Utils.bytes2HexStr(result.out, result.outLen, true).toUpperCase() + "  [rc="
         + result.rc + "  len=" + result.outLen + "]");
+    if (result.ok) {
+      log(String.format("   st0='%c' st1='%c' st2='%c' dataLen=%d", result.st0, result.st1,
+          result.st2, result.dataLen));
+    } else if (result.outLen >= 5) {
+      log(String.format("   ERROR e='%c%c'", (char) (result.out[3] & 0xFF),
+          (char) (result.out[4] & 0xFF)));
+    }
+
     return result;
   }
 
